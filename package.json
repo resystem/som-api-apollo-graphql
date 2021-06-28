@@ -1,0 +1,28 @@
+{
+  "name": "som-api-apollo-graphql",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "babel": "babel",
+    "dev": "nodemon --exec babel-node --experimental-modules --es-module-specifier-resolution=node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server": "^2.25.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7",
+    "@babel/cli": "^7.14.5",
+    "@babel/core": "^7.14.6",
+    "@babel/node": "^7.14.7",
+    "@babel/plugin-transform-modules-commonjs": "^7.14.5",
+    "@babel/preset-env": "^7.14.7",
+    "body-parser": "^1.19.0",
+    "graphql": "^15.5.1",
+    "graphql-tools": "^7.0.5"
+  }
+}

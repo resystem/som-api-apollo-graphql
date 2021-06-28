@@ -1,0 +1,15 @@
+export default [
+  { label: 'Banheiros adaptados' },
+  { label: 'Elevador' },
+  { label: 'Bebedouro adaptado' },
+  { label: 'Circuito de visitação adaptado' },
+  { label: 'Elevador adaptado' },
+  { label: 'Telefone público adaptado' },
+  { label: 'Vaga de estacionamento exclusiva para idosos' },
+  { label: 'Rampa de acesso' },
+  { label: 'Sinalização tátil' },
+  { label: 'Cadeira de rodas para uso do visitante' },
+  { label: 'Corrimão nas escadas e rampas' },
+  { label: 'Sanitário adaptado' },
+  { label: 'Vaga de estacionamento exclusiva para deficientes' },
+];
