@@ -7,8 +7,8 @@ files:
   - source: ./deploy/files/som-api-graphql.service
     destination: /lib/systemd/system/
 
-  - source: ./deploy/files/nginx.config
-    destination: /etc/nginx/sites-enabled/default
+  - source: ./deploy/files/default
+    destination: /etc/nginx/sites-enabled
 
 hooks:
   BeforeInstall:
