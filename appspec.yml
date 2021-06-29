@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: ./
-    destination: /home/ubuntu/som-api-apollo-graphqlapi/
+    destination: /home/ubuntu/som-api-apollo-graphql/
 
   - source: ./deploy/files/som-api-graphql.service
     destination: /lib/systemd/system/
