@@ -3,6 +3,15 @@
     "@babel/preset-env"
   ],
   "plugins": [
-    "@babel/plugin-transform-modules-commonjs"
+    "@babel/plugin-transform-modules-commonjs",
+    ["@babel/plugin-transform-runtime",
+      {
+        "regenerator": true
+      }
+    ]
+  ],
+  "babelrcRoots": [
+    "src/*",
+    "index.js"
   ]
 }

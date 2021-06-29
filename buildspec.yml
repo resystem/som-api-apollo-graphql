@@ -15,6 +15,11 @@ phases:
       - echo Using variables
       - echo NODE_ENV = $NODE_ENV
 
+      # Building backend
+      - echo Backend build started on `date`
+      - yarn build
+      - echo Backend build completed on `date`
+
       # Run Tests
       # - echo Backend build started on `date`
       # - npm run test:gt:runs

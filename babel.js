@@ -1,4 +1,4 @@
-const babel = require("@babel/core");
-const index = require('./index');
+import babel from "@babel/core";
+import index from './index.js';
 
 babel.transformSync(index, optionsObject);
