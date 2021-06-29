@@ -1,2 +1,2 @@
 sudo pkill node
-sudo systemctl stop ida-authentication-api
+sudo systemctl stop som-api-graphql

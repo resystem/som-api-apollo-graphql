@@ -1,0 +1,16 @@
+[Unit]
+Description=SOM GRAPHQL API
+Documentation=https://github.com/resystem/som-api-apollo-graphql
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/som-api-apollo-graphql
+ExecStart=/usr/bin/npm index.js
+EnvironmentFile=/etc/environments/som-api-apollo-graphql.config
+Restart=always
+StartLimitBurst=0
+
+[Install]
+WantedBy=multi-user.target
