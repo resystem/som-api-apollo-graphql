@@ -1,28 +1,25 @@
 version: 0.0
 os: linux
 files:
-  - source: ./dist/
-    destination: /home/ubuntu/som-api-apollo-graphqlapi/dist/
+  - source: ./**/*
+    destination: /home/ubuntu/som-api-apollo-graphqlapi/*
 
-  - source: ./package.json
-    destination: /home/ubuntu/som-api-apollo-graphqlapi/
- 
-  - source: ./server-files/som-api-graphql.service
+  - source: ./deploy/files/som-api-graphql.service
     destination: /lib/systemd/system/
 
-  - source: ./server-files/default
-    destination: /etc/nginx/sites-enabled/
+  - source: ./deploy/files/nginx.config
+    destination: /etc/nginx/sites-enabled/default
 
 hooks:
   BeforeInstall:
-    - location: ./scripts/before_install.sh
+    - location: ./deploy/scripts/before_install.sh
       timeout: 300
       runas: root
   ApplicationStop:
-    - location: ./scripts/application_stop.sh
+    - location: ./deploy/scripts/application_stop.sh
       timeout: 300
       runas: root
   ApplicationStart:
-    - location: ./scripts/application_start.sh
+    - location: ./deploy/scripts/application_start.sh
       timeout: 300
       runas: root
