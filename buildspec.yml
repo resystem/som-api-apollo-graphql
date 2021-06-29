@@ -20,7 +20,7 @@ phases:
       - yarn build
       - echo Backend build completed on `date`
 
-      - cp ./deploy/files/nginx.config  /deploy/files/default
+      - cp ./deploy/files/nginx.config  ./deploy/files/default
 
       # Run Tests
       # - echo Backend build started on `date`
