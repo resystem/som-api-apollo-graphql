@@ -5,6 +5,31 @@ import MongoDB from './db/Mongodb';
 
 dotenv.config()
 
+
+const myPlugin = {
+
+  // Fires whenever a GraphQL request is received from a client.
+  requestDidStart(requestContext) {
+    console.log('Request started!');
+
+    return {
+
+      // Fires whenever Apollo Server will parse a GraphQL
+      // request to create its associated document AST.
+      parsingDidStart(requestContext) {
+        console.log('Parsing started!');
+      },
+
+      // Fires whenever Apollo Server will validate a
+      // request's document AST against your GraphQL schema.
+      validationDidStart(requestContext) {
+        console.log('Validation started!');
+      },
+
+    }
+  },
+};
+
 const initMongo = async () => {
   const mongoDb = await MongoDB({
     mongoUrl: process.env.MONGO_URL ? `mongodb+${process.env.MONGO_URL}` : null,
@@ -16,6 +41,9 @@ initMongo().then((mongo) => {
     ...schema,
     introspection: true,
     playground: true,
+    plugins: [
+      myPlugin
+    ],
     playground: {
       settings: {
         'editor.theme': 'dark',
