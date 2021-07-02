@@ -1,6 +1,9 @@
 import { ApolloServer } from 'apollo-server';
 import schema from './graphql/schema';
+import dotenv from 'dotenv';
 import MongoDB from './db/Mongodb';
+
+dotenv.config()
 
 const initMongo = async () => {
   const mongoDb = await MongoDB({
@@ -11,19 +14,17 @@ const initMongo = async () => {
 initMongo().then((mongo) => {
   const app = new ApolloServer({
     ...schema,
-    // introspection: true,
+    introspection: true,
     playground: true,
     playground: {
       settings: {
         'editor.theme': 'dark',
       },
     },
-    path: '/graphql',
-    context: async ({ context }) => {
+    path: '/',
+    context: ({ req }) => {
       return ({
-        headers: event.headers,
-        functionName: context.functionName,
-        context,
+        req,
         acessibilityOptions: mongo.model('acessibilityOptions'),
         categoryOptions: mongo.model('categoryOptions'),
         productorOccupations: mongo.model('productorOccupations'),
@@ -38,7 +39,7 @@ initMongo().then((mongo) => {
         countries: mongo.model('countries'),
         states: mongo.model('states'),
         cities: mongo.model('cities'),
-      });
+      })
     }
   });
   
@@ -50,5 +51,3 @@ initMongo().then((mongo) => {
     `);
   });
 });
-
-// Initialize the app
