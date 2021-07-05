@@ -81,6 +81,9 @@ initMongo().then((mongo) => {
         countries: mongo.model('countries'),
         states: mongo.model('states'),
         cities: mongo.model('cities'),
+        communityUsers: conn.model('communityUsers'),
+        news: conn.model('news'),
+        highlightedOportunities: conn.model('highlightedOportunities'),
       })
     }
   });
