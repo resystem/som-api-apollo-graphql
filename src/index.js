@@ -44,6 +44,7 @@ initMongo().then((mongo) => {
     plugins: [
       myPlugin
     ],
+    cors: false,
     playground: {
       settings: {
         'editor.theme': 'dark',
@@ -84,7 +85,6 @@ initMongo().then((mongo) => {
   // Start the server
   app.listen(3000, () => {
     console.log(`
-      playground running on: http://localhost:3000/playground
       graphql running on: http://localhost:3000/graphql
     `);
   });
