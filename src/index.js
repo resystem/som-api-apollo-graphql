@@ -44,7 +44,9 @@ initMongo().then((mongo) => {
     plugins: [
       myPlugin
     ],
-    cors: false,
+    cors: {
+      origin: ['http://som.vc/', 'https://som.vc/' ]
+    },
     playground: {
       settings: {
         'editor.theme': 'dark',
