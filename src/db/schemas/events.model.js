@@ -14,6 +14,7 @@ const eventsModel = new Schema({
   location: { type: ObjectId, ref: 'locations' },
   name: { type: String, default: '' },
   about: { type: String, default: '' },
+  stream_url: { type: String, default: '' },
   photo: {
     mimified: { type: String, default: '' },
     original: { type: String, default: '' },
@@ -35,6 +36,11 @@ const eventsModel = new Schema({
   has_city_transportation: { type: Boolean, default: false },
   has_interstate_transportation: { type: Boolean, default: false },
   has_international_transportation: { type: Boolean, default: false },
+  is_online: { type: Boolean, default: false },
+  is_physical: { type: Boolean, default: false },
+  is_on_som: { type: Boolean, default: false },
+  is_to_artist: { type: Boolean, default: true },
+  is_to_productor: { type: Boolean, default: false },
   has_money_paid: { type: Boolean, default: false },
   musical_genres: [{ type: ObjectId, ref: 'musical_genres' }],
 }, {

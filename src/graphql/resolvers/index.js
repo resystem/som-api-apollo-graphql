@@ -13,6 +13,9 @@ import state from './state.resolver';
 import city from './city.resolver';
 import location from './location.resolver';
 import productorOccupation from './productorOccupation.resolver';
+import communityUser from './communityUser.resolver';
+import highlightedOportunity from './highlightedOportunity.resolver';
+import newResolver from './new.resolver';
 
 export default {
   Query: {
@@ -29,6 +32,9 @@ export default {
     ...state.queries,
     ...city.queries,
     ...productorOccupation.queries,
+    ...communityUser.queries,
+    ...highlightedOportunity.queries,
+    ...newResolver.queries,
   },
   Mutation: {
     ...acessibilityOption.mutations,
@@ -46,5 +52,8 @@ export default {
     ...city.mutations,
     ...location.mutations,
     ...productorOccupation.mutations,
+    ...communityUser.mutations,
+    ...highlightedOportunity.mutations,
+    ...newResolver.mutations,
   },
 };

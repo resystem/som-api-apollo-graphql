@@ -15,38 +15,52 @@ import songs from './schemas/songs.model';
 import countries from './schemas/country.model';
 import states from './schemas/state.model';
 import cities from './schemas/city.model';
+import communityUsers from './schemas/communityUser.model';
+import highlightedOportunities from './schemas/highlighted_oportunities.model';
+import news from './schemas/news.model';
 
-export default async ({ mongoUrl }) => {
-  console.log('mongoUrl:', mongoUrl);
+let connection;
+
+export default async ({ mongoUrl = 'mongodb://localhost/som-local' }) => {
   try {
-    console.log('=> using new database connection');
+    if (!connection) {
+      console.log('=> using new database connection');
 
-    const connection = await mongoose.createConnection(mongoUrl || 'mongodb://localhost/som-local', {
-      bufferCommands: false,
-      bufferMaxEntries: 0,
-      keepAlive: true,
-      useNewUrlParser: true,
-      useFindAndModify: false,
-      useCreateIndex: true,
-      useUnifiedTopology: true,
+      connection = await mongoose.createConnection(mongoUrl, {
+        bufferCommands: false,
+        bufferMaxEntries: 0,
+        keepAlive: true,
+        useNewUrlParser: true,
+        useFindAndModify: false,
+        useCreateIndex: true,
+        useUnifiedTopology: true,
 
-    });
-    connection.model('acessibilityOptions', acessibilityOptions);
-    connection.model('categoryOptions', categoryOptions);
-    connection.model('musicalStyleOptions', musicalStyleOptions);
-    connection.model('spaceCapacityOptions', spaceCapacityOptions);
-    connection.model('productors', productors);
-    connection.model('productorOccupations', productorOccupations);
-    connection.model('artists', artists);
-    connection.model('users', users);
-    connection.model('events', events);
-    connection.model('locations', locations);
-    connection.model('songs', songs);
-    connection.model('countries', countries);
-    connection.model('states', states);
-    connection.model('cities', cities);
-    return connection;
+      });
+
+      connection.model('acessibilityOptions', acessibilityOptions);
+      connection.model('categoryOptions', categoryOptions);
+      connection.model('musicalStyleOptions', musicalStyleOptions);
+      connection.model('spaceCapacityOptions', spaceCapacityOptions);
+      connection.model('productors', productors);
+      connection.model('productorOccupations', productorOccupations);
+      connection.model('artists', artists);
+      connection.model('users', users);
+      connection.model('events', events);
+      connection.model('locations', locations);
+      connection.model('songs', songs);
+      connection.model('countries', countries);
+      connection.model('states', states);
+      connection.model('cities', cities);
+      connection.model('communityUsers', communityUsers);
+      connection.model('highlightedOportunities', highlightedOportunities);
+      connection.model('news', news);
+
+      return connection;
+    }
   } catch (err) {
     throw err;
   }
+
+  console.log('=> using exist database connection');
+  return connection;
 };

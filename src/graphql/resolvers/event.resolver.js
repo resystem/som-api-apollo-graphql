@@ -5,6 +5,8 @@ export default {
     oneEvent: EventController.findOne,
     allEvents: EventController.findAll,
     searchEvents: EventController.search,
+    allEventToArtist: EventController.findLastPostedToArtist,
+    allEventToProductor: EventController.findLastPostedToProductor,
   },
   mutations: {
     createEvent: EventController.create,

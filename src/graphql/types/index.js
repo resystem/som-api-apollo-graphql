@@ -14,6 +14,9 @@ import countryType from './country.type';
 import cityType from './city.type';
 import stateType from './state.type';
 import productorOccupationType from './productorOccupation.type';
+import communityUserType from './communityUser.type';
+import highlightedOportunityType from './highlightedOportunity.type';
+import newType from './new.type';
 
 export default `
   scalar JSON
@@ -34,6 +37,10 @@ export default `
   ${musicalStyleOptionType}
   ${spaceCapacityOptionType}
   ${productorOccupationType}
+
+  ${communityUserType}
+  ${highlightedOportunityType}
+  ${newType}
 
   ${paginatorType}
 `;

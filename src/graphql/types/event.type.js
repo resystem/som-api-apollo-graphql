@@ -22,6 +22,14 @@ export default `
     end_event_date: String
     subscribe_closing_date: String
     
+    stream_url: String
+    is_online: Boolean
+    is_physical: Boolean
+    is_on_som: Boolean
+
+    is_to_artist: Boolean
+    is_to_productor: Boolean
+    
     has_accommodation: Boolean
     has_food: Boolean
     has_local_transportation: Boolean
@@ -32,7 +40,8 @@ export default `
   }
   
   input EventInput {
-    productor: String 
+    productor: String
+    personas: [String]
 
     approved_artists: [String]
     reproved_artists: [String]
@@ -53,6 +62,14 @@ export default `
     event_date: String
     end_event_date: String
     subscribe_closing_date: String
+
+    stream_url: String
+    is_online: Boolean
+    is_physical: Boolean
+    is_on_som: Boolean
+
+    is_to_artist: Boolean
+    is_to_productor: Boolean
     
     has_accommodation: Boolean
     has_food: Boolean

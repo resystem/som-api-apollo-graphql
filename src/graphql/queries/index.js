@@ -13,6 +13,9 @@ import songQuery from './song.query';
 import countryQuery from './country.query';
 import cityQuery from './city.query';
 import stateQuery from './state.query';
+import communityUserQuery from './communityUser.query';
+import highlightedOportunityQuery from './highlightedOportunity.query';
+import newQuery from './new.query';
 
 export default `
   type Query {
@@ -30,5 +33,9 @@ export default `
     ${eventQuery}
     ${songQuery}
     ${productorOccupationQuery}
+
+    ${communityUserQuery}
+    ${highlightedOportunityQuery}
+    ${newQuery}
   }
 `;

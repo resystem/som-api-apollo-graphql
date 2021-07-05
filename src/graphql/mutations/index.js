@@ -13,6 +13,9 @@ import cityMutation from './city.mutation';
 import stateMutation from './state.mutation';
 import locationMutation from './location.mutation';
 import productorOccupation from './productorOccupation.mutation';
+import communityUserMutation from './communityUser.mutation';
+import highlightedOportunityMutation from './highlightedOportunity.mutation';
+import newMutation from './new.mutation';
 
 export default `
   type Mutation {
@@ -31,5 +34,8 @@ export default `
     ${databaseMutation}
     ${eventMutation}
     ${productorOccupation}
+    ${communityUserMutation}
+    ${highlightedOportunityMutation}
+    ${newMutation}
   }
 `;

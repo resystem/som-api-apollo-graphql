@@ -15,4 +15,7 @@ export default `
     event: EventInput
     paginator: PaginatorInput
   ): [Event]
+
+  allEventToArtist: [Event]
+  allEventToProductor: [Event]
 `;
