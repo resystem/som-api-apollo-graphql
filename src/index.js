@@ -45,7 +45,8 @@ initMongo().then((mongo) => {
       myPlugin
     ],
     cors: {
-      origin: [/^http:\/\/som\.vc/, /^https:\/\/som\.vc/ ]
+      origin: '*',
+      credentials: true,
     },
     playground: {
       settings: {
