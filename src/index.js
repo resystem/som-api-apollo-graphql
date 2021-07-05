@@ -1,7 +1,6 @@
 import { ApolloServer } from 'apollo-server';
 import schema from './graphql/schema';
 import dotenv from 'dotenv';
-import cors from 'cors';
 import MongoDB from './db/Mongodb';
 
 dotenv.config()
@@ -45,6 +44,10 @@ initMongo().then((mongo) => {
     plugins: [
       myPlugin
     ],
+    cors: {
+      origin: true,
+      credentials: true
+    },
     playground: {
       settings: {
         'editor.theme': 'dark',
@@ -81,7 +84,7 @@ initMongo().then((mongo) => {
       })
     }
   });
-  app.use(cors())
+  
   // Start the server
   app.listen(3000, () => {
     console.log(`
