@@ -1,5 +1,5 @@
 
-import { gql } from 'apollo-server-lambda';
+import { gql } from 'apollo-server';
 
 import types from './types';
 import queries from './queries';
