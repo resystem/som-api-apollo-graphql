@@ -4,7 +4,7 @@ import { Schema } from 'mongoose';
 const { ObjectId } = Schema.Types;
 
 const highlightedOportunityModel = new Schema({
-  oportunity: { type: ObjectId, ref: 'events', required: true },
+  oportunity: { type: ObjectId, ref: 'events' },
   image: { type: String, required: true },
   mobile_image: { type: String },
   link: { type: String },
