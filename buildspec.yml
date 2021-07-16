@@ -22,6 +22,7 @@ phases:
 
       - cp ./deploy/files/nginx.config  ./deploy/files/default
 
+      - perl -pi -e "s/__SERVER_NAME__/$SERVER_NAME/g; s/__SSL_CERTIFICATE__/$SSL_CERTIFICATE/g; s/__SSL_CERTIFICATE_KEY__/$SSL_CERTIFICATE_KEY/g "  deploy/files/default
       # Run Tests
       # - echo Backend build started on `date`
       # - npm run test:gt:runs
