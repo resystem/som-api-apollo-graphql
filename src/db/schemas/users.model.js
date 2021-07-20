@@ -5,6 +5,7 @@ const { ObjectId } = Schema.Types;
 const userModel = new Schema({
   ida: { type: String, unique: true, required: true },
   type: { type: String, default: 'commun' },
+  sales_id: { type: String },
   productor: { type: ObjectId, ref: 'productors' },
   artist: { type: ObjectId, ref: 'artists' },
   likes: [{ type: ObjectId, ref: 'users' }],

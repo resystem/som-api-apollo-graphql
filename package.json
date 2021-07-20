@@ -16,6 +16,7 @@
     "@babel/plugin-transform-runtime": "^7.14.5",
     "apollo-server": "^2.25.2",
     "apollo-server-lambda": "^2.25.2",
+    "axios": "^0.21.1",
     "core-js": "2",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
