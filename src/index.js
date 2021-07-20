@@ -89,9 +89,9 @@ initMongo().then((mongo) => {
   });
   
   // Start the server
-  app.listen(3000, () => {
+  app.listen(process.env.GRAPH_PORT || 3000, () => {
     console.log(`
-      graphql running on: http://localhost:3000/graphql
+      graphql running on: http://localhost:${process.env.GRAPH_PORT || 3000}/graphql
     `);
   });
 });

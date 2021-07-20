@@ -71,7 +71,6 @@ const findOne = (parent, args, { states }) => {
 const findAll = async (parent, args, { states }) => {
   const options = sliceArgs(args);
   const myCountries = await states.find(options.query.state).populate('country');
-  console.log('TCL: findAll -> myCountries', myCountries);
   return myCountries.map((c) => {
     const country = c;
     country.id = c._id;

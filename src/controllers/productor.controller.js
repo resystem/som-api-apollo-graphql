@@ -1,3 +1,4 @@
+import { getAuthorization, mapProducerToSales, sendToSalesForce } from '../services/salesforce.service';
 import { sliceArgs } from '../utils/query.utils';
 
 /**
@@ -30,9 +31,20 @@ const create = async (parent, args, { productors, users }) => {
       throw new Error(err);
     });
 
+  let salesforceId = '';
+  try {
+    const mappedToSales = mapProducerToSales(productor);
+    const auth = await getAuthorization();
+    const salesForceUser = await sendToSalesForce(auth, mappedToSales);
+    salesforceId = salesForceUser.id;
+  } catch (err) {
+    throw err;
+    console.log('err:', err);
+  }
+
   await users.update(
     { _id: productor.user._id },
-    { productor: productor._id },
+    { productor: productor._id, sales_id: salesforceId },
     { new: true },
   );
 
@@ -47,11 +59,11 @@ const create = async (parent, args, { productors, users }) => {
   * @param {object} args Informações envadas na queuery ou mutation
   * @param {object} context Informações passadas no context para o apollo graphql
   */
-const update = (parent, args, { productors }) => {
+const update = async (parent, args, { productors, users }) => {
   const validate = {}; // validateArtist(); fazer função de validação
   if (validate.error) throw new Error(validate.msg);
 
-  return productors.findOneAndUpdate({ _id: args.productor_id }, args.productor, { new: true })
+  const producer = await productors.findOneAndUpdate({ _id: args.productor_id }, args.productor, { new: true })
     .populate('user')
     .populate('events')
     .populate('musical_styles')
@@ -61,6 +73,23 @@ const update = (parent, args, { productors }) => {
     .catch((err) => {
       throw new Error(err);
     });
+
+  let salesforceId = '';
+  try {
+    const mappedToSales = mapProducerToSales(producer);
+    const auth = await getAuthorization();
+    const salesForceUser = await sendToSalesForce(auth, mappedToSales);
+    salesforceId = salesForceUser.id;
+  } catch (err) {
+    throw err;
+  }
+
+  await users.update(
+    { _id: producer.user._id },
+    { sales_id: salesforceId },
+  );
+
+  return producer;
 };
 
 /**

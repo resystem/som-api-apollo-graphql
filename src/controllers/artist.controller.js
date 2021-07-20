@@ -1,3 +1,4 @@
+import { getAuthorization, mapArtistToSales, sendToSalesForce } from '../services/salesforce.service';
 import { sliceArgs } from '../utils/query.utils';
 
 /**
@@ -9,7 +10,6 @@ import { sliceArgs } from '../utils/query.utils';
   * @param {object} context Informações passadas no context para o apollo graphql
   */
 const create = async (parent, args, { artists, users }) => {
-  console.log('artist', args.artist);
   const validate = {}; // validateArtist(); fazer função de validação
   if (validate.error) throw new Error(validate.msg);
 
@@ -27,10 +27,20 @@ const create = async (parent, args, { artists, users }) => {
     throw err;
   }
 
+  let salesforceId = '';
+  try {
+    const mappedToSales = mapArtistToSales(artist);
+    const auth = await getAuthorization();
+    const salesForceUser = await sendToSalesForce(auth, mappedToSales);
+    salesforceId = salesForceUser.id;
+  } catch (err) {
+    throw err;
+  }
+
   try {
     await users.findOneAndUpdate(
       { _id: artist.user._id },
-      { artist: artist._id },
+      { artist: artist._id, sales_id: salesforceId },
       { new: true },
     );
   } catch (err) {
@@ -49,21 +59,42 @@ const create = async (parent, args, { artists, users }) => {
   * @param {object} args Informações envadas na queuery ou mutation
   * @param {object} context Informações passadas no context para o apollo graphql
   */
-const update = (parent, args, { artists }) => {
+const update = async (parent, args, { artists, users }) => {
   const validate = {}; // validateArtist(); fazer função de validação
   if (validate.error) throw new Error(validate.msg);
 
-  return artists.findOneAndUpdate({ _id: args.artist_id }, args.artist, { new: true })
+  const artist = await artists.findOneAndUpdate({ _id: args.artist_id }, args.artist, { new: true })
     // .populate('approved_events')
     // .populate('subscribed_events')
     // .populate('recused_events')
     .populate('songs')
     .populate('musical_styles')
     .populate('location')
+    .populate('user')
     .then(resp => resp)
     .catch((err) => {
       throw new Error(err);
     });
+
+  let salesforceId = '';
+  try {
+    const mappedToSales = mapArtistToSales(artist);
+    const auth = await getAuthorization();
+    const salesForceUser = await sendToSalesForce(auth, mappedToSales);
+    salesforceId = salesForceUser.id;
+  } catch (err) {
+    console.log('err:', err);
+  }
+  try {
+    await users.findOneAndUpdate(
+      { _id: artist.user._id },
+      { sales_id: salesforceId },
+      { new: true },
+    );
+  } catch (err) {
+    console.log('err:', err);
+  }
+  return artist;
 };
 
 /**
