@@ -87,14 +87,16 @@ const update = async (parent, args, { artists, users }) => {
   } catch (err) {
     console.log('err:', err);
   }
-  try {
-    await users.findOneAndUpdate(
-      { _id: artist.user._id },
-      { sales_id: salesforceId },
-      { new: true },
-    );
-  } catch (err) {
-    console.log('err:', err);
+  if (salesforceId) {
+    try {
+      await users.findOneAndUpdate(
+        { _id: artist.user._id },
+        { sales_id: salesforceId },
+        { new: true },
+      );
+    } catch (err) {
+      console.log('err:', err);
+    }
   }
   return artist;
 };

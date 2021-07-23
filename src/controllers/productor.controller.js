@@ -82,13 +82,16 @@ const update = async (parent, args, { productors, users }) => {
     const salesForceUser = await sendToSalesForce(auth, mappedToSales);
     salesforceId = salesForceUser.id;
   } catch (err) {
-    throw err;
+    console.log('err:', err);
   }
+  
+  if (salesforceId)  {
+    await users.update(
+      { _id: producer.user._id },
+      { sales_id: salesforceId },
+    );
+  };
 
-  await users.update(
-    { _id: producer.user._id },
-    { sales_id: salesforceId },
-  );
 
   return producer;
 };
