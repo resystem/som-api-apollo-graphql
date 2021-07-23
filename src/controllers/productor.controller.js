@@ -38,13 +38,14 @@ const create = async (parent, args, { productors, users }) => {
     const salesForceUser = await sendToSalesForce(auth, mappedToSales);
     salesforceId = salesForceUser.id;
   } catch (err) {
-    throw err;
     console.log('err:', err);
   }
+  const mappeduser = { productor: productor._id };
+  if (salesforceId) mappeduser.sales_id = salesforceId;
 
   await users.update(
     { _id: productor.user._id },
-    { productor: productor._id, sales_id: salesforceId },
+    mappeduser,
     { new: true },
   );
 

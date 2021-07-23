@@ -70,12 +70,6 @@ export const mapProducerToSales = (producer) => ({
 });
 
 export const getAuthorization = async () => {
-  console.log('🚀 ~ SF_SECRET()', SF_SECRET());
-  console.log('🚀 ~ SF_ID()', SF_ID());
-  console.log('🚀 ~ SF_USERNAME()', SF_USERNAME());
-  console.log('🚀 ~ SF_PASSWORD()', SF_PASSWORD());
-  console.log('🚀 ~ SF_AUTH_URL()', SF_AUTH_URL());
-  console.log('🚀 ~ SF_URL()', SF_URL());
   const authorization = await axios({
     url: `${SF_AUTH_URL()}/services/oauth2/token?grant_type=password&client_id=${SF_ID()}&client_secret=${SF_SECRET()}&username=${SF_USERNAME()}&password=${SF_PASSWORD()}`,
     method: 'post',

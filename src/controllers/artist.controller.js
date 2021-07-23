@@ -34,13 +34,15 @@ const create = async (parent, args, { artists, users }) => {
     const salesForceUser = await sendToSalesForce(auth, mappedToSales);
     salesforceId = salesForceUser.id;
   } catch (err) {
-    throw err;
+    console.log('err:', err);
   }
+  const mappeduser = { artist: artist._id };
+  if (salesforceId) mappeduser.sales_id = salesforceId;
 
   try {
     await users.findOneAndUpdate(
       { _id: artist.user._id },
-      { artist: artist._id, sales_id: salesforceId },
+      mappeduser,
       { new: true },
     );
   } catch (err) {
