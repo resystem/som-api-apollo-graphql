@@ -79,7 +79,7 @@ const findOne = (parent, args, { users }) => {
     .populate('favorited_songs')
     .populate({
       path: 'productor',
-      populate: ['musical_styles', 'location', 'occupations'],
+      populate: ['musical_styles', 'location', 'occupations', 'events'],
     });
 };
 
@@ -115,7 +115,7 @@ const findAll = (parent, args, { users }) => {
     .populate('favorited_songs')
     .populate({
       path: 'productor',
-      populate: ['musical_styles', 'location', 'occupations'],
+      populate: ['musical_styles', 'location', 'occupations', 'events'],
     });
 };
 

@@ -48,7 +48,7 @@ const update = (parent, args, { events }) => {
   const validate = {}; // validateArtist(); fazer função de validação
   if (validate.error) throw new Error(validate.msg);
 
-  return events.findOneAndUpdate({ _id: args.event_id }, args.event, { new: true })
+  return events.findOneAndUpdate({ _id: args.id }, args.event, { new: true })
     .populate('approved_productors')
     .populate('reproved_productors')
     .populate('approved_artists')
