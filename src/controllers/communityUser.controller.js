@@ -29,7 +29,11 @@ const create = async (parent, args, { communityUsers }) => {
   * @param {object} context Informações passadas no context para o apollo graphql
   */
 const findAll = async (parent, args, { communityUsers }) => communityUsers.find({})
-  .populate('user');
+  .populate('user')
+  .populate({
+    path: 'user',
+    populate: ['artist', 'productor']
+  });
 
 export default {
   create,
