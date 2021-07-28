@@ -18,5 +18,6 @@ export default {
     aproveArtist: EventController.aprove,
     reproveArtist: EventController.reprove,
     resetSubscriptionEvent: EventController.resetSubscription,
+    removeOpportunity: EventController.remove,
   },
 };

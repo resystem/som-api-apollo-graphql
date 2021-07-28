@@ -2,6 +2,7 @@ import { Schema } from 'mongoose';
 
 const { ObjectId } = Schema.Types;
 
+// change model name to producer
 const productModel = Schema({
   user: { type: ObjectId, ref: 'users' },
   photo: { type: String, default: '' },

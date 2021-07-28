@@ -42,4 +42,6 @@ export default `
     event_id: String!,
     artist_id: String!,
   ): Event
+
+  removeOpportunity(id: ID!): Event
 `;

@@ -42,6 +42,7 @@ const eventsModel = new Schema({
   is_to_artist: { type: Boolean, default: true },
   is_to_productor: { type: Boolean, default: false },
   has_money_paid: { type: Boolean, default: false },
+  deleted: { type: Boolean, default: false },
   musical_genres: [{ type: ObjectId, ref: 'musical_genres' }],
 }, {
   usePushEach: true,

@@ -28,6 +28,7 @@ const create = async (parent, args, { events, productors }) => {
       .populate('subscribed_productors')
       .populate('subscribers')
       .execPopulate());
+
   await productors.findOneAndUpdate(
     { _id: event.productor },
     { $push: { events: event._id } },
@@ -48,7 +49,7 @@ const update = (parent, args, { events }) => {
   const validate = {}; // validateArtist(); fazer função de validação
   if (validate.error) throw new Error(validate.msg);
 
-  return events.findOneAndUpdate({ _id: args.id }, args.event, { new: true })
+  return events.findOneAndUpdate({ _id: args.id, deleted: false }, args.event, { new: true })
     .populate('approved_productors')
     .populate('reproved_productors')
     .populate('approved_artists')
@@ -79,7 +80,7 @@ const update = (parent, args, { events }) => {
 const findOne = (parent, args, { events }) => {
   const options = sliceArgs(args);
 
-  return events.findOne({ _id: options.query.id })
+  return events.findOne({ _id: options.query.id, deleted: false })
     .populate('approved_productors')
     .populate('reproved_productors')
     .populate('approved_artists')
@@ -109,7 +110,7 @@ const findOne = (parent, args, { events }) => {
   */
 const findAll = (parent, args, { events }) => {
   const options = sliceArgs(args);
-  return events.find(options.query.event)
+  return events.find({ ...options.query.event, deleted: false })
     .sort(options.paginator.sort || {})
     .limit(options.paginator.limit || 0)
     .populate('approved_productors')
@@ -130,6 +131,52 @@ const findAll = (parent, args, { events }) => {
       throw new Error(err);
     });
 };
+
+/**
+ * 
+ * @param {} parent 
+ * @param {} args 
+ * @param {} param2 
+ * @returns 
+ */
+const remove = async (parent, args, { events, productors }) => {
+  const event = await events.findOneAndUpdate(
+    { _id: args.id },
+    {
+      deleted: true,
+      subscribers: [],
+      subscribed_productors: [],
+      approved_artists: [],
+      reproved_artists: [],
+      approved_productors: [],
+      reproved_productors: [],
+    },
+    { new: true },
+  );
+  if (!event) throw new Error('Event not found');
+  
+  const promises = [];
+
+  event.approved_artists.forEach((_id) => {
+    promises.push(artists.findOneAndUpdate({ _id }, { $pull: { approved_events: event._id } }))   
+  });
+
+  event.subscribers.forEach((_id) => {
+    promises.push(artists.findOneAndUpdate({ _id }, { $pull: { subscribed_events: event._id } }))   
+  });
+
+  event.reproved_artists.forEach((_id) => {
+    promises.push(artists.findOneAndUpdate({ _id }, { $pull: { recused_events: event._id } }))  
+  });
+
+  event.subscribed_productors.forEach((_id) => {
+    promises.push(productors.findOneAndUpdate({ _id }, { $pull: { subscribed_oportunities: event._id } }))   
+  });
+
+  await Promise.all(promises);
+  await productors.findOneAndUpdate({ _id: event.productor }, { $pull: { events: event._id } });
+  return event;
+}
 
 /**
   * Essa função procura e retorna os ultimos eventos da base de dados
@@ -475,6 +522,7 @@ const resetSubscription = async (parent, args, { events, artists }) => {
 
 export default {
   create,
+  remove,
   findOne,
   findAll,
   update,
