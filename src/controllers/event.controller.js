@@ -80,7 +80,12 @@ const update = (parent, args, { events }) => {
 const findOne = (parent, args, { events }) => {
   const options = sliceArgs(args);
 
-  return events.findOne({ _id: options.query.id, deleted: false })
+  return events.findOne({
+    $or: [
+      { _id: options.query.id, deleted: { $exists: true },  deleted: false },
+      { _id: options.query.id, deleted: { $exists: false } },
+    ],
+  })
     .populate('approved_productors')
     .populate('reproved_productors')
     .populate('approved_artists')
@@ -110,7 +115,12 @@ const findOne = (parent, args, { events }) => {
   */
 const findAll = (parent, args, { events }) => {
   const options = sliceArgs(args);
-  return events.find({ ...options.query.event, deleted: false })
+  return events.find({
+    $or: [
+      { ...options.query.event, deleted: { $exists: true },  deleted: false },
+      { ...options.query.event, deleted: { $exists: false } },
+    ],
+  })
     .sort(options.paginator.sort || {})
     .limit(options.paginator.limit || 0)
     .populate('approved_productors')
@@ -186,7 +196,12 @@ const remove = async (parent, args, { events, productors }) => {
   * @param {object} args Informações envadas na queuery ou mutation
   * @param {object} context Informações passadas no context para o apollo graphql
   */
-const findLastPostedToArtist = (parent, args, { events }) => events.find({ is_to_artist: true })
+const findLastPostedToArtist = (parent, args, { events }) => events.find({
+  $or: [
+    { is_to_artist: true, deleted: { $exists: true },  deleted: false },
+    { is_to_artist: true, deleted: { $exists: false } },
+  ],
+})
   .sort({ created_at: -1 })
   .populate('approved_productors')
   .populate('reproved_productors')
@@ -215,7 +230,12 @@ const findLastPostedToArtist = (parent, args, { events }) => events.find({ is_to
 * @param {object} context Informações passadas no context para o apollo graphql
 */
 const findLastPostedToProductor = (parent, args, { events }) => events
-  .find({ is_to_productor: true })
+  .find({ 
+    $or: [
+      { is_to_productor: true, deleted: { $exists: true },  deleted: false },
+      { is_to_productor: true, deleted: { $exists: false } },
+    ],
+  })
   .sort({ created_at: -1 })
   .populate('approved_productors')
   .populate('reproved_productors')
@@ -252,6 +272,7 @@ const search = async (parent, args, {
   const agregate = [];
   const firstMatch = {
     ...args.event,
+    deleted: false
   };
   if (args.musical_styles && args.musical_styles.length) {
     firstMatch.musical_styles = { $in: args.musical_styles };
