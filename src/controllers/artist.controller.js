@@ -34,13 +34,15 @@ const create = async (parent, args, { artists, users }) => {
     const salesForceUser = await sendToSalesForce(auth, mappedToSales);
     salesforceId = salesForceUser.id;
   } catch (err) {
-    throw err;
+    console.log('err:', err);
   }
+  const mappeduser = { artist: artist._id };
+  if (salesforceId) mappeduser.sales_id = salesforceId;
 
   try {
     await users.findOneAndUpdate(
       { _id: artist.user._id },
-      { artist: artist._id, sales_id: salesforceId },
+      mappeduser,
       { new: true },
     );
   } catch (err) {
@@ -85,14 +87,16 @@ const update = async (parent, args, { artists, users }) => {
   } catch (err) {
     console.log('err:', err);
   }
-  try {
-    await users.findOneAndUpdate(
-      { _id: artist.user._id },
-      { sales_id: salesforceId },
-      { new: true },
-    );
-  } catch (err) {
-    console.log('err:', err);
+  if (salesforceId) {
+    try {
+      await users.findOneAndUpdate(
+        { _id: artist.user._id },
+        { sales_id: salesforceId },
+        { new: true },
+      );
+    } catch (err) {
+      console.log('err:', err);
+    }
   }
   return artist;
 };
