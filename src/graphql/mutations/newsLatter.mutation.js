@@ -1,5 +1,5 @@
 export default `
     createNewsLatter(
-        newsLatter: NewsLaterInput!
+        newsLatter: NewsLatterInput!
     ): NewsLatter
 `;

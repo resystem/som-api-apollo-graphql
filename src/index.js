@@ -83,6 +83,7 @@ initMongo().then((mongo) => {
         cities: mongo.model('cities'),
         communityUsers: mongo.model('communityUsers'),
         news: mongo.model('news'),
+        newsLatters: mongo.model('newsLatters'),
         highlightedOportunities: mongo.model('highlightedOportunities'),
       })
     }

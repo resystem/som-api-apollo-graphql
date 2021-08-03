@@ -6,17 +6,8 @@
   * @param {object} args Informações envadas na query ou mutation
   * @param {object} context Informações passadas no context para o apollo graphql
   */
- const create = async (parent, args, { newsLatters }) => {
-  const validate = {}; // fazer função de validação
-  if (validate.error) throw new Error(validate.msg);
-
-  // cria uma oportunidade em destaque no banco de dados
-  return newsLatters.create(args.newsLatter)
-    .then(async resp => resp)
-    .catch((err) => {
-      throw new Error(err);
-    });
-};
+ const create = async (parent, args, { newsLatters }) => newsLatters
+  .create(args.newsLatter);
 
 /**
   * findAll - Essa função procura e retorna várias noticias no SOM
