@@ -293,6 +293,15 @@ const search = async (parent, args, {
     secondMatch.event_month = { $in: args.months };
   }
 
+  if (secondMatch.$or) aggregate.push({ $lookup: { from: 'musical_genres', as: 'tags' } });
+
+  if (args.text && args.text.length) {
+    secondMatch.$or = [
+      { name: new RegExp(args.text, 'ig') },
+      { tags: new RegExp(args.text, 'ig') },
+    ];
+  }
+
   agregate.push({ $match: firstMatch });
   agregate.push({ $addFields: addFields });
 
