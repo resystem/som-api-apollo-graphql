@@ -9,6 +9,17 @@
  const create = async (parent, args, { newsLatters }) => newsLatters
   .create(args.newsLatter);
 
+
+  /**
+  * findOne - Essa função procura e retorna uma newsLatter de evento na base de dados
+  *
+  * @function findOne
+  * @param {object} parent Informações de um possível pai
+  * @param {object} args Informações envadas na queuery ou mutation
+  * @param {object} context Informações passadas no context para o apollo graphql
+  */
+const findOne = (parent, args, { newsLatters }) => newsLatters
+  .findOne({ email: args.newsLatter.email });
 /**
   * findAll - Essa função procura e retorna várias noticias no SOM
   * da base de dados
@@ -24,4 +35,5 @@ const findAll = async (parent, args, { newsLatters }) => newsLatters
 export default {
   create,
   findAll,
+  findOne,
 };
