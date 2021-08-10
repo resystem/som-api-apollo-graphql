@@ -14,6 +14,7 @@ export default `
     months: [Int]
     event: EventInput
     paginator: PaginatorInput
+    text: String
   ): [Event]
 
   allEventToArtist: [Event]
