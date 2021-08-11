@@ -8,5 +8,7 @@ export default {
   mutations: {
     createProductor: ProductorController.create,
     updateProductor: ProductorController.update,
+    followProductor: ProductorController.follow,
+    unfollowProductor: ProductorController.unfollow,
   },
 };

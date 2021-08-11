@@ -10,7 +10,7 @@ import { sliceArgs } from '../utils/query.utils';
   * @param {object} context Informações passadas no context para o apollo graphql
   */
 const create = async (parent, args, { productors, users }) => {
-  const validate = {}; // validateArtist(); fazer função de validação
+  const validate = {}; // validateproductor(); fazer função de validação
   if (validate.error) throw new Error(validate.msg);
 
   const productor = await productors.create(args.productor)
@@ -60,7 +60,7 @@ const create = async (parent, args, { productors, users }) => {
   * @param {object} context Informações passadas no context para o apollo graphql
   */
 const update = async (parent, args, { productors, users }) => {
-  const validate = {}; // validateArtist(); fazer função de validação
+  const validate = {}; // validateproductor(); fazer função de validação
   if (validate.error) throw new Error(validate.msg);
 
   const producer = await productors.findOneAndUpdate({ _id: args.productor_id }, args.productor, { new: true })
@@ -69,6 +69,7 @@ const update = async (parent, args, { productors, users }) => {
     .populate('musical_styles')
     .populate('occupations')
     .populate('location')
+    .populate('follows.user')
     .then(resp => resp)
     .catch((err) => {
       throw new Error(err);
@@ -107,14 +108,15 @@ const findOne = (parent, args, { productors }) => productors.findOne({ _id: args
     path: 'events',
     populate: [
       'subscribers',
-      'approved_artists',
-      'reproved_artists',
+      'approved_productors',
+      'reproved_productors',
       'location',
     ],
   })
   .populate('musical_styles')
   .populate('occupations')
   .populate('location')
+  .populate('follows.user')
   .then(resp => resp)
   .catch((err) => {
     throw new Error(err);
@@ -137,18 +139,108 @@ const findAll = (parent, args, { productors }) => {
       path: 'events',
       populate: [
         'subscribers',
-        'approved_artists',
-        'reproved_artists',
+        'approved_productors',
+        'reproved_productors',
         'location',
       ],
     })
     .populate('musical_styles')
     .populate('occupations')
     .populate('location')
+    .populate('follows.user')
     .then(resp => resp)
     .catch((err) => {
       throw new Error(err);
     });
+};
+
+/**
+  * follow - Essa função segue um produtor
+  *
+  * @function follow
+  * @param {object} parent Informações de um possível pai
+  * @param {object} args Informações envadas na queuery ou mutation
+  * @param {object} context Informações passadas no context para o apollo graphql
+  */
+const follow = async (parent, args, { productors, users }) => {
+  const { productor, user } = args;
+  await users.findOneAndUpdate(
+    { _id: user },
+    {
+      $push: { following_productors: productor },
+    },
+    { new: true },
+  );
+  return productors.findOneAndUpdate({ _id: productor }, { follows: { user } }, { new: true })
+    .populate('user')
+    .populate('events')
+    .populate({
+      path: 'events',
+      populate: [
+        'subscribers',
+        'approved_productors',
+        'reproved_productors',
+        'location',
+      ],
+    })
+    .populate('musical_styles')
+    .populate('occupations')
+    .populate('location')
+    .populate('follows.user')
+    .then(resp => resp)
+    .catch((err) => {
+      throw new Error(err);
+    });
+};
+
+/**
+  * unfollow - Essa função deixa de seguir um produtor
+  *
+  * @function follow
+  * @param {object} parent Informações de um possível pai
+  * @param {object} args Informações envadas na queuery ou mutation
+  * @param {object} context Informações passadas no context para o apollo graphql
+  */
+const unfollow = async (parent, args, { productors, users }) => {
+  try {
+    const { productor, user } = args;
+    await users.findOneAndUpdate(
+      { _id: user },
+      {
+        $pull: { following_productors: productor },
+      },
+      { new: true },
+    );
+
+    const myproductor = await productors.findOneAndUpdate(
+      { _id: productor },
+      { $pull: { follows: { user } } },
+      { new: true },
+    )
+      .populate('user')
+      .populate('events')
+      .populate({
+        path: 'events',
+        populate: [
+          'subscribers',
+          'approved_productors',
+          'reproved_productors',
+          'location',
+        ],
+      })
+      .populate('musical_styles')
+      .populate('occupations')
+      .populate('location')
+      .populate('follows.user')
+      .then(resp => resp)
+      .catch((err) => {
+        throw new Error(err);
+      });
+
+    return myproductor;
+  } catch (err) {
+    throw err;
+  }
 };
 
 export default {
@@ -156,4 +248,6 @@ export default {
   findOne,
   findAll,
   update,
+  follow,
+  unfollow
 };
