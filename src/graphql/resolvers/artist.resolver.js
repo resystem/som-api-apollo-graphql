@@ -5,6 +5,7 @@ export default {
     oneArtist: ArtistController.findOne,
     allArtists: ArtistController.findAll,
     searchArtists: ArtistController.searchArtists,
+    newSearchArtists: ArtistController.search
   },
   mutations: {
     createArtist: ArtistController.create,

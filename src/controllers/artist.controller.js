@@ -260,6 +260,59 @@ const unfollow = async (parent, args, { artists, users }) => {
   }
 };
 
+/**
+  * searchArtists - Essa função procura e retorna vários artistas da base de dados
+  *
+  * @function searchArtists
+  * @param {object} parent Informações de um possível pai
+  * @param {object} args Informações envadas na queuery ou mutation
+  */
+ const search = async (parent, args, {
+  artists, musicalStyleOptions, users
+}) => {
+
+  const $lookup = {
+    from: musicalStyleOptions.collection.name,
+    as: 'musicalStyleObjects',
+    localField: 'musical_styles',
+    foreignField: '_id'
+  }
+
+  const $match = {
+    $or: [{
+        name: new RegExp(args.text, 'ig')
+      },
+      {
+        'musicalStyleObjects.name': new RegExp(args.text, 'ig')
+      }
+    ]
+  }
+
+  const aggregate = [];
+  
+  aggregate.push({
+    $lookup
+  })
+
+  aggregate.push({
+    $match
+  })
+
+  const artistsResponse = await artists.aggregate(aggregate)
+    .skip(args.paginator?.skip || 0)
+    .limit(args.paginator?.limit || 25);
+
+  await users.populate(artistsResponse, {
+    path: 'user'
+  });
+  await musicalStyleOptions.populate(artistsResponse, {
+    path: 'musical_styles'
+  });
+
+  return artistsResponse.map(artist => ({ ...artist, id: artist._id })) || [];
+}
+
+
 export default {
   create,
   findOne,
@@ -268,4 +321,5 @@ export default {
   searchArtists,
   follow,
   unfollow,
+  search
 };

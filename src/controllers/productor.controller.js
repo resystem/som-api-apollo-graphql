@@ -183,20 +183,19 @@ const findAll = (parent, args, {
 };
 
 /**
- * findAll - Essa função procura e retorna vários produtores de eventos da base de dados
- *
- * @function findAll
- * @param {object} parent Informações de um possível pai
- * @param {object} args Informações envadas na queuery ou mutation
- * @param {object} context Informações passadas no context para o apollo graphql
- */
+  * searchProducers - Essa função procura e retorna vários produtores da base de dados
+  *
+  * @function searchProducers
+  * @param {object} parent Informações de um possível pai
+  * @param {object} args Informações envadas na queuery ou mutation
+  */
 const search = async (parent, args, {
-  productors, users, occupations
+  productors, users, productorOccupations
 }) => {
 
   const $lookup = {
-    from: 'occupations',
-    as: 'occupations',
+    from: productorOccupations.collection.name,
+    as: 'occupationsObjects',
     localField: 'occupations',
     foreignField: '_id'
   }
@@ -206,15 +205,17 @@ const search = async (parent, args, {
         name: new RegExp(args.text, 'ig')
       },
       {
-        occupations: new RegExp(args.text, 'ig')
+        'occupationsObjects.label': new RegExp(args.text, 'ig')
       }
     ]
   }
 
   const aggregate = [];
-  // aggregate.push({
-  //   $lookup
-  // })
+  
+  aggregate.push({
+    $lookup
+  })
+
   aggregate.push({
     $match
   })
@@ -223,15 +224,18 @@ const search = async (parent, args, {
     .skip(args.paginator?.skip || 0)
     .limit(args.paginator?.limit || 25);
 
-    console.log(producers)
+    console.log(productorOccupations.collection.name)
 
 
   await users.populate(producers, {
     path: 'user'
   });
-  await occupations.populate(producers, {
+  await productorOccupations.populate(producers, {
     path: 'occupations'
   });
+
+  console.log(producers)
+
 
   return producers.map(producer => ({ ...producer, id: producer._id })) || [];
 }
