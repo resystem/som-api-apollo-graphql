@@ -1,4 +1,9 @@
 export default `
+  type ProductorFollow {
+    user: User
+    created_at: String
+  }  
+
   type Productor {
     id: ID
     user: User
@@ -10,6 +15,7 @@ export default `
     location: Location
     followers: [User]
     following: [Artist]
+    follows: [ProductorFollow]
     musical_styles: [MusicalStyleOption]
     occupations: [ProductorOccupation]
     events: [Event]
