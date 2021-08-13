@@ -43,7 +43,7 @@ const eventsModel = new Schema({
   is_to_productor: { type: Boolean, default: false },
   has_money_paid: { type: Boolean, default: false },
   deleted: { type: Boolean, default: false },
-  musical_genres: [{ type: ObjectId, ref: 'musical_genres' }],
+  musical_styles: [{ type: ObjectId, ref: 'musical_styles' }],
 }, {
   usePushEach: true,
   timestamps: { updatedAt: 'updated_at', createdAt: 'created_at' },

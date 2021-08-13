@@ -12,4 +12,8 @@ export default `
     artist: JSON
     paginator: PaginatorInput
   ): [Artist]
+
+  newSearchArtists(
+    text: String!
+  ): [Artist]
 `;

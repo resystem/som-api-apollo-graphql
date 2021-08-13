@@ -269,10 +269,12 @@ const search = async (parent, args, {
   productors,
   locations,
 }) => {
-  const agregate = [];
+  const aggregate = [];
   const firstMatch = {
-    ...args.event,
-    deleted: false
+    $or: [
+      { ...args.event, deleted: { $exists: true },  deleted: false },
+      { ...args.event, deleted: { $exists: false } },
+    ],
   };
   if (args.musical_styles && args.musical_styles.length) {
     firstMatch.musical_styles = { $in: args.musical_styles };
@@ -285,24 +287,36 @@ const search = async (parent, args, {
 
   const secondMatch = {};
 
-  if (args.years.length) {
+  if (args.years?.length) {
     secondMatch.event_year = { $in: args.years };
   }
 
-  if (args.months.length) {
+  if (args.months?.length) {
     secondMatch.event_month = { $in: args.months };
   }
+  
+  if (args.text?.length) {
+    const textMatch = [
+      { name: new RegExp(args.text, 'ig') },
+      { 'musical_styles.name': new RegExp(args.text, 'ig') }
+    ];
+    secondMatch.$or = textMatch; 
+  }
 
-  agregate.push({ $match: firstMatch });
-  agregate.push({ $addFields: addFields });
+  aggregate.push({ $addFields: addFields });
+  aggregate.push({ $match: firstMatch });
 
-  if (Object.keys(secondMatch).length) agregate.push({ $match: secondMatch });
+  if (args.text) aggregate.push({ $lookup: { from: 'musical_styles', as: 'tags', localField: 'musical_styles', foreignField: '_id' } });
 
-  if (args.paginator.sort) agregate.push({ $sort: args.paginator.sort });
+  if (Object.keys(secondMatch).length) aggregate.push({ $match: secondMatch });
 
-  const myEvents = await events.aggregate(agregate)
-    .skip(args.paginator.skip || 0)
-    .limit(args.paginator.limit || 25);
+  if (args.paginator?.sort) aggregate.push({ $sort: args.paginator.sort });
+
+  console.log(aggregate[1])
+
+  const myEvents = await events.aggregate(aggregate)
+    .skip(args.paginator?.skip || 0)
+    .limit(args.paginator?.limit || 25);
 
   await artists.populate(myEvents, { path: 'approved_artists' });
   await productors.populate(myEvents, { path: 'productor', populate: { path: 'location' } });
