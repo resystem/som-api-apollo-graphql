@@ -16,6 +16,7 @@ import productorOccupation from './productorOccupation.mutation';
 import communityUserMutation from './communityUser.mutation';
 import highlightedOportunityMutation from './highlightedOportunity.mutation';
 import newMutation from './new.mutation';
+import newsLatterMutation from './newsLatter.mutation';
 
 export default `
   type Mutation {
@@ -37,5 +38,6 @@ export default `
     ${communityUserMutation}
     ${highlightedOportunityMutation}
     ${newMutation}
+    ${newsLatterMutation}
   }
 `;

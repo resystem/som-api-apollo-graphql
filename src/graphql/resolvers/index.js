@@ -16,6 +16,7 @@ import productorOccupation from './productorOccupation.resolver';
 import communityUser from './communityUser.resolver';
 import highlightedOportunity from './highlightedOportunity.resolver';
 import newResolver from './new.resolver';
+import newsLatterResolver from './newsLatter.resolver';
 
 export default {
   Query: {
@@ -35,6 +36,7 @@ export default {
     ...communityUser.queries,
     ...highlightedOportunity.queries,
     ...newResolver.queries,
+    ...newsLatterResolver.queries,
   },
   Mutation: {
     ...acessibilityOption.mutations,
@@ -55,5 +57,6 @@ export default {
     ...communityUser.mutations,
     ...highlightedOportunity.mutations,
     ...newResolver.mutations,
+    ...newsLatterResolver.mutations,
   },
 };

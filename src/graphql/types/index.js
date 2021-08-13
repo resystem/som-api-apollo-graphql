@@ -17,6 +17,7 @@ import productorOccupationType from './productorOccupation.type';
 import communityUserType from './communityUser.type';
 import highlightedOportunityType from './highlightedOportunity.type';
 import newType from './new.type';
+import newsLatterType from './newsLatter.type';
 
 export default `
   scalar JSON
@@ -41,6 +42,7 @@ export default `
   ${communityUserType}
   ${highlightedOportunityType}
   ${newType}
+  ${newsLatterType}
 
   ${paginatorType}
 `;
