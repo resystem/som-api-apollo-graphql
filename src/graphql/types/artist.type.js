@@ -13,6 +13,7 @@ export default `
     members_number: Int
     avatar_image: Image
     about: String
+    username: String
     country: String
     state: String
     city: String
@@ -51,6 +52,7 @@ export default `
     phone: String
     name: String
     members_number: Int
+    username: String
     avatar_image: ImageInput
     about: String
     country: String

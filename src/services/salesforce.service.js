@@ -31,7 +31,7 @@ export const mapArtistToSales = (artist) => ({
   EstiloMusical: artist?.musical_styles?.map(m => m?.name).join('; '),
   Integrantes: artist?.integrants?.join('; '),
   
-  PaginaSomArtista: artist ? `https://som.vc/artist/${artist?._id}` : '',
+  PaginaSomArtista: artist ? `https://som.vc/artist/${artist?.username}` : '',
   // Pagina500Cidades: '',
 
   // Cidade: user.productor?.location?.city || user.artist?.location?.city || '',

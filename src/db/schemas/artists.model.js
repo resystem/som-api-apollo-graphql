@@ -7,6 +7,7 @@ ObjectId.prototype.valueOf = () => this.toString();
 const artistModel = new Schema({
   user: { type: ObjectId, ref: 'users' },
   name: { type: String, required: true },
+  username: { type: String },
   members_number: { type: Number, default: 1 },
   avatar_image: {
     mimified: { type: String, default: '' },
