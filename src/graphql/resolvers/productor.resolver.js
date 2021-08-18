@@ -9,5 +9,6 @@ export default {
   mutations: {
     createProductor: ProductorController.create,
     updateProductor: ProductorController.update,
+    populateProducersUsername: ProductorController.populateUsername,
   },
 };

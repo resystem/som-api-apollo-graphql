@@ -1,6 +1,7 @@
 export default `
   oneArtist( 
-    id: ID!
+    id: ID
+    username: String
   ): Artist
 
   allArtists( 

@@ -22,6 +22,9 @@ const create = async (parent, args, {
   const validate = {}; // validateArtist(); fazer função de validação
   if (validate.error) throw new Error(validate.msg);
 
+  const verify = await productors.findOne({ username: args.productor.username });
+  if (verify) throw new Error('invalid/username');
+
   const productor = await productors.create(args.productor)
     .then(resp => resp
       .populate('user')
@@ -80,11 +83,10 @@ const update = async (parent, args, {
   const validate = {}; // validateArtist(); fazer função de validação
   if (validate.error) throw new Error(validate.msg);
 
-  const producer = await productors.findOneAndUpdate({
-      _id: args.productor_id
-    }, args.productor, {
-      new: true
-    })
+  const verify = await productors.findOne({ username: args.productor.username });
+  if (verify && verify._id !== args.productor_id) throw new Error('invalid/username');
+
+  const producer = await productors.findOneAndUpdate({ _id: args.productor_id }, args.productor, { new: true })
     .populate('user')
     .populate('events')
     .populate('musical_styles')
@@ -118,18 +120,14 @@ const update = async (parent, args, {
 };
 
 /**
- * findOne - Essa função procura e retorna um produtor de evento na base de dados
- *
- * @function findOne
- * @param {object} parent Informações de um possível pai
- * @param {object} args Informações envadas na queuery ou mutation
- * @param {object} context Informações passadas no context para o apollo graphql
- */
-const findOne = (parent, args, {
-    productors
-  }) => productors.findOne({
-    _id: args.productor.id
-  })
+  * findOne - Essa função procura e retorna um produtor de evento na base de dados
+  *
+  * @function findOne
+  * @param {object} parent Informações de um possível pai
+  * @param {object} args Informações envadas na queuery ou mutation
+  * @param {object} context Informações passadas no context para o apollo graphql
+  */
+const findOne = (parent, args, { productors }) => productors.findOne({ username: args.productor.username })
   .populate('user')
   .populate('events')
   .populate({
@@ -239,11 +237,32 @@ const search = async (parent, args, {
 
   return producers.map(producer => ({ ...producer, id: producer._id })) || [];
 }
+/**
+  * populateUsername - Essa função procura e retorna vários produtores de eventos da base de dados
+  *
+  * @function populateUsername
+  * @param {object} parent Informações de um possível pai
+  * @param {object} args Informações envadas na queuery ou mutation
+  * @param {object} context Informações passadas no context para o apollo graphql
+  */
+const populateUsername = async (parent, args, { productors }) => {
+  const producers = await productors.find({ username: { $exists: false} })
+  const requests = producers.map((p) => new Promise(async (res, rej) => {
+    const producer = await productors.findOneAndUpdate({ _id: p._id }, { username: getRandomCode(6) },  { new: true });
+    console.log('🚀 ~ producer', producer.username);
+    return {
+      ...producer,
+      id: producer._id,
+    }
+  }));
+  return await Promise.all(requests);
+};
 
 export default {
   create,
   findOne,
   findAll,
   update,
-  search
+  search,
+  populateUsername
 };

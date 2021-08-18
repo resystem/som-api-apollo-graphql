@@ -1,5 +1,6 @@
 import { getAuthorization, mapArtistToSales, sendToSalesForce } from '../services/salesforce.service';
 import { sliceArgs } from '../utils/query.utils';
+import { getRandomCode } from '../utils/random.utils';
 
 /**
   * create - Essa função cria um artista na base de dados
@@ -16,6 +17,9 @@ const create = async (parent, args, { artists, users }) => {
   let artist;
 
   try {
+    artist = await artists.findOne({ username: args.artist.username });
+    if (artist) throw new Error('invalid/username');
+
     artist = await artists.create(args.artist);
     artist = await artist.populate('location')
       .populate('musical_styles')
@@ -64,6 +68,9 @@ const create = async (parent, args, { artists, users }) => {
 const update = async (parent, args, { artists, users }) => {
   const validate = {}; // validateArtist(); fazer função de validação
   if (validate.error) throw new Error(validate.msg);
+  
+  const verify = await artists.findOne({ username: args.artist.username });
+  if (verify && verify._id !== args.artist_id) throw new Error('invalid/username');
 
   const artist = await artists.findOneAndUpdate({ _id: args.artist_id }, args.artist, { new: true })
     // .populate('approved_events')
@@ -110,7 +117,7 @@ const update = async (parent, args, { artists, users }) => {
   * @param {object} context Informações passadas no context para o apollo graphql
   */
 const findOne = (parent, args, { artists }) => artists
-  .findOne({ _id: args.id })
+  .findOne({ username: args.username })
   .populate('user')
   .populate({
     path: 'user',
@@ -311,6 +318,26 @@ const unfollow = async (parent, args, { artists, users }) => {
 
   return artistsResponse.map(artist => ({ ...artist, id: artist._id })) || [];
 }
+/**
+  * populateUsername - Essa função procura e retorna vários produtores de eventos da base de dados
+  *
+  * @function populateUsername
+  * @param {object} parent Informações de um possível pai
+  * @param {object} args Informações envadas na queuery ou mutation
+  * @param {object} context Informações passadas no context para o apollo graphql
+  */
+const populateUsername = async (parent, args, { artists }) => {
+  const allArtsts = await artists.find({ username: { $exists: false} })
+  const requests = allArtsts.map((a) => new Promise(async (res, rej) => {
+    const artist = await artists.findOneAndUpdate({ _id: a._id }, { username: getRandomCode(6) },  { new: true });
+    console.log('🚀 ~ artist', artist.username);
+    return {
+      ...artist,
+      id: artist._id,
+    }
+  }));
+  return await Promise.all(requests);
+};
 
 
 export default {
@@ -321,5 +348,6 @@ export default {
   searchArtists,
   follow,
   unfollow,
-  search
+  search,
+  populateUsername
 };

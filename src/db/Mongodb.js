@@ -23,6 +23,7 @@ import newsLatters from './schemas/newsLatter.model';
 let connection;
 
 export default async ({ mongoUrl = 'mongodb://localhost/som-local' }) => {
+  console.log('🚀 ~ mongoUrl', mongoUrl);
   try {
     if (!connection) {
       console.log('=> using new database connection');
