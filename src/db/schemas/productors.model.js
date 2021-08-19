@@ -6,6 +6,7 @@ const { ObjectId } = Schema.Types;
 const productModel = Schema({
   user: { type: ObjectId, ref: 'users' },
   photo: { type: String, default: '' },
+  username: { type: String },
   name: { type: String, defualt: '' },
   cpf: { type: String, defualt: '' },
   cnpj: { type: String, defualt: '' },

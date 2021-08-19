@@ -14,4 +14,5 @@ export default `
     artist: ID!,
     user: ID!
   ) : Artist
+  populateArtstsUsername: [Artist]
 `;

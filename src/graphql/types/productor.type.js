@@ -8,6 +8,7 @@ export default `
     cnpj: String
     description: String
     location: Location
+    username: String
     followers: [User]
     following: [Artist]
     musical_styles: [MusicalStyleOption]
@@ -33,6 +34,7 @@ export default `
     cnpj: String
     followers: [ID]
     following: [ID]
+    username: String
     id: ID
     location: ID
     musical_styles: [String]

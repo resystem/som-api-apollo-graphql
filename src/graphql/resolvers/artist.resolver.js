@@ -12,5 +12,6 @@ export default {
     updateArtist: ArtistController.update,
     followArtist: ArtistController.follow,
     unfollowArtist: ArtistController.unfollow,
+    populateArtstsUsername: ArtistController.populateUsername,
   },
 };
