@@ -70,7 +70,7 @@ const update = async (parent, args, { artists, users }) => {
   if (validate.error) throw new Error(validate.msg);
   
   const verify = await artists.findOne({ username: args.artist.username });
-  if (verify && verify._id !== args.artist_id) throw new Error('invalid/username');
+  if (verify && verify._id.toString() !== args.artist_id) throw new Error('invalid/username');
 
   const artist = await artists.findOneAndUpdate({ _id: args.artist_id }, args.artist, { new: true })
     // .populate('approved_events')

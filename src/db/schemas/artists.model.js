@@ -14,6 +14,7 @@ const artistModel = new Schema({
     original: { type: String, default: '' },
     thumbnail: { type: String, default: '' },
   },
+  status: { type: String, default: 'INCOMPLETE' },
   about: { type: String, default: '' },
   country: { type: String, default: '' },
   state: { type: String, default: '' },

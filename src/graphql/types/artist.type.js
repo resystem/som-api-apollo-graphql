@@ -44,6 +44,7 @@ export default `
     telegram: String
     integrants: [String]
     follows: [ArtistFollow]
+    status: String
   }
   
   input ArtistInput {
@@ -74,5 +75,6 @@ export default `
     twitter: String
     youtube: String
     email: String
+    status: String
   }
 `;

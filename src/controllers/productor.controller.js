@@ -61,7 +61,7 @@ const create = async (parent, args, {
       _id: productor.user._id
     },
     mappeduser, {
-      new: true
+      new: true 
     },
   );
 
@@ -84,7 +84,7 @@ const update = async (parent, args, {
   if (validate.error) throw new Error(validate.msg);
 
   const verify = await productors.findOne({ username: args.productor.username });
-  if (verify && verify._id !== args.productor_id) throw new Error('invalid/username');
+  if (verify && verify._id.toString() !== args.productor_id) throw new Error('invalid/username');
 
   const producer = await productors.findOneAndUpdate({ _id: args.productor_id }, args.productor, { new: true })
     .populate('user')
