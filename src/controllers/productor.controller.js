@@ -38,6 +38,7 @@ const create = async (parent, args, {
       .populate('musical_styles')
       .populate('occupations')
       .populate('location')
+      .populate('follows')
       .execPopulate())
     .catch((err) => {
       throw new Error(err);
@@ -92,6 +93,7 @@ const update = async (parent, args, {
     .populate('musical_styles')
     .populate('occupations')
     .populate('location')
+    .populate('follows')
     .then(resp => resp)
     .catch((err) => {
       throw new Error(err);
@@ -139,9 +141,11 @@ const findOne = (parent, args, { productors }) => productors.findOne({ username:
       'location',
     ],
   })
+  .populate('follows')
   .populate('musical_styles')
   .populate('occupations')
   .populate('location')
+  .populate('follows')
   .then(resp => resp)
   .catch((err) => {
     throw new Error(err);
@@ -174,6 +178,7 @@ const findAll = (parent, args, {
     .populate('musical_styles')
     .populate('occupations')
     .populate('location')
+    .populate('follows')
     .then(resp => resp)
     .catch((err) => {
       throw new Error(err);
@@ -258,11 +263,71 @@ const populateUsername = async (parent, args, { productors }) => {
   return await Promise.all(requests);
 };
 
+/**
+  * follow - Essa função realiza a lógica de seguidores
+  *
+  * @function follow
+  * @param {object} parent Informações de um possível pai
+  * @param {object} args Informações envadas na queuery ou mutation
+  * @param {object} context Informações passadas no context para o apollo graphql
+  */
+const follow = async (parent, args, {
+  productors
+}) => {
+  const { id, user_id } = args;
+  const productor = await productors.findOne({ _id: id });
+
+  const followers = JSON.parse(JSON.stringify(productor));
+  const follows = followers.follows.filter(sbs => sbs !== user_id);
+
+  follows.push(user_id);
+
+  const producer = await productors
+    .findOneAndUpdate({ _id: id }, { follows: follows })
+    .populate('user')
+    .populate('follows') 
+    .catch((err) => {
+      throw new Error(err);
+    });
+  return producer;
+};
+
+/**
+  * unfollow - Essa função realiza a lógica de seguidores
+  *
+  * @function unfollow
+  * @param {object} parent Informações de um possível pai
+  * @param {object} args Informações envadas na queuery ou mutation
+  * @param {object} context Informações passadas no context para o apollo graphql
+  */
+const unfollow = async (parent, args, {
+  productors
+}) => {
+  const { id, user_id } = args;
+  const productor = await productors.findOne({ _id: id });
+  
+  const followers = JSON.parse(JSON.stringify(productor));
+
+  const follows = followers.follows.filter(sbs => sbs !== user_id);
+
+  const producer = await productors
+    .findOneAndUpdate({ _id: id }, { follows: follows })
+    .populate('user')
+    .populate('follows') 
+    .catch((err) => {
+      throw new Error(err);
+    });
+
+  return producer;
+};
+
 export default {
   create,
   findOne,
   findAll,
   update,
   search,
-  populateUsername
+  populateUsername,
+  follow,
+  unfollow
 };

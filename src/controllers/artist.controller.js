@@ -121,7 +121,7 @@ const findOne = (parent, args, { artists }) => artists
   .populate('user')
   .populate({
     path: 'user',
-    populate: ['following_artists', 'following_productors'],
+    populate: ['following_artists', 'following_artists'],
   })
   .populate('approved_events')
   .populate('subscribed_events')
@@ -189,82 +189,61 @@ const findAll = (parent, args, { artists }) => {
 };
 
 /**
-  * follow - Essa função segue um artist
+  * follow - Essa função realiza a lógica de seguidores
   *
   * @function follow
   * @param {object} parent Informações de um possível pai
   * @param {object} args Informações envadas na queuery ou mutation
   * @param {object} context Informações passadas no context para o apollo graphql
   */
-const follow = async (parent, args, { artists, users }) => {
-  const { artist, user } = args;
-  await users.findOneAndUpdate(
-    { _id: user },
-    {
-      $push: { following_artists: artist },
-    },
-    { new: true },
-  );
-  return artists.findOneAndUpdate({ _id: artist }, { follows: { user } }, { new: true })
+ const follow = async (parent, args, {
+  artists
+}) => {
+  const { id, user_id } = args;
+  const artist = await artists.findOne({ _id: id });
+
+  const followers = JSON.parse(JSON.stringify(artist));
+  const follows = followers.follows.filter(sbs => sbs !== user_id);
+
+  follows.push(user_id);
+
+  const producer = await artists
+    .findOneAndUpdate({ _id: id }, { follows: follows })
     .populate('user')
-    .populate('approved_events')
-    .populate('subscribed_events')
-    .populate('recused_events')
-    .populate('musical_styles')
-    .populate('musical_genres')
-    .populate('location')
-    .populate('category')
-    .populate('follows.user')
-    .populate('following_artists')
-    .populate('following_productors')
-    .then(resp => resp)
+    .populate('follows') 
     .catch((err) => {
       throw new Error(err);
     });
+  return producer;
 };
 
 /**
-  * unfollow - Essa função deixa de seguir um artist
+  * unfollow - Essa função realiza a lógica de seguidores
   *
-  * @function follow
+  * @function unfollow
   * @param {object} parent Informações de um possível pai
   * @param {object} args Informações envadas na queuery ou mutation
   * @param {object} context Informações passadas no context para o apollo graphql
   */
-const unfollow = async (parent, args, { artists, users }) => {
-  try {
-    const { artist, user } = args;
-    await users.findOneAndUpdate(
-      { _id: user },
-      {
-        $pull: { following_artists: artist },
-      },
-      { new: true },
-    );
+const unfollow = async (parent, args, {
+  artists
+}) => {
+  const { id, user_id } = args;
+  const artist = await artists.findOne({ _id: id });
+  
+  const followers = JSON.parse(JSON.stringify(artist));
 
-    const myartist = await artists.findOneAndUpdate(
-      { _id: artist },
-      { $pull: { follows: { user } } },
-      { new: true },
-    )
-      .populate('user')
-      .populate('approved_events')
-      .populate('subscribed_events')
-      .populate('recused_events')
-      .populate('musical_styles')
-      .populate('musical_genres')
-      .populate('location')
-      .populate('category')
-      .populate('follows.user')
-      .then(resp => resp)
-      .catch((err) => {
-        throw new Error(err);
-      });
+  const follows = followers.follows.filter(sbs => sbs !== user_id);
 
-    return myartist;
-  } catch (err) {
-    throw err;
-  }
+  const producer = await artists
+    .findOneAndUpdate({ _id: id }, { follows: follows })
+    .populate('user')
+    .populate('follows') 
+    .catch((err) => {
+      throw new Error(err);
+    });
+
+  return producer;
 };
 
 /**

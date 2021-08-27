@@ -1,10 +1,4 @@
 export default `
-
-  type ArtistFollow {
-    user: User
-    created_at: String
-  }  
-
   type Artist {
     id: ID
     user: User
@@ -43,7 +37,7 @@ export default `
     whatsapp: String
     telegram: String
     integrants: [String]
-    follows: [ArtistFollow]
+    follows: [User]
     status: String
   }
   
