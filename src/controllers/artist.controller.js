@@ -121,7 +121,7 @@ const findOne = (parent, args, { artists }) => artists
   .populate('user')
   .populate({
     path: 'user',
-    populate: ['following_artists', 'following_artists'],
+    populate: ['following_artists', 'following_productors'],
   })
   .populate('approved_events')
   .populate('subscribed_events')
