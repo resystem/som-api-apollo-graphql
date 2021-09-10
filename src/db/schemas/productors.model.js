@@ -13,6 +13,7 @@ const productModel = Schema({
   description: { type: String, default: '' },
   status: { type: String, default: 'INCOMPLETE' },
   location: { type: ObjectId, ref: 'locations' },
+  follows: [{ type: ObjectId, ref: 'users' }],
   followers: [{ type: ObjectId, ref: 'users' }],
   following: [{ type: ObjectId, ref: 'artists' }],
   musical_styles: [{ type: ObjectId, ref: 'musicalStyleOptions' }],

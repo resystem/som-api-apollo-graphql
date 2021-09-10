@@ -10,5 +10,7 @@ export default {
     createProductor: ProductorController.create,
     updateProductor: ProductorController.update,
     populateProducersUsername: ProductorController.populateUsername,
+    followProductor: ProductorController.follow,
+    unfollowProductor: ProductorController.unfollow,
   },
 };
