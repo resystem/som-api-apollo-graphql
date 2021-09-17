@@ -1,10 +1,22 @@
 export default `
   createProductor(
     productor: ProductorInput!
-    ): Productor
+  ): Productor
+
   updateProductor(
     productor_id: ID!
     productor: ProductorInput!
-    ): Productor
+  ): Productor
+
+  followProductor(
+    id: String!
+    user_id: String!
+  ): Productor
+
+  unfollowProductor(
+    id: String!
+    user_id: String!
+  ): Productor
+
   populateProducersUsername: [Productor]
 `;
