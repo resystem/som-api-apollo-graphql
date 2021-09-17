@@ -495,6 +495,36 @@ const aprove = async (parent, args, { events, artists }) => {
   return event;
 };
 
+
+const aproveProducer = async (parent, args, { events, productors }) => {
+  const event = await events.findOneAndUpdate(
+    {
+      _id: args.event_id,
+    }, {
+      $pull: { subscribed_productors: args.producer_id },
+      $push: { approved_productors: args.producer_id },
+    },
+  ).populate('approved_productors')
+    .populate('reproved_productors')
+    .populate('approved_artists')
+    .populate('reproved_artists')
+    .populate({
+      path: 'productor',
+      populate: {
+        path: 'location',
+      },
+    })
+    .populate('location')
+    .populate('subscribed_productors')
+    .populate('subscribers');
+  await productors.findOneAndUpdate(
+    { _id: args.producer_id },
+    { $push: { approved_events: args.event_id } },
+  );
+  return event;
+};
+
+
 const reprove = async (parent, args, { events, artists }) => {
   const event = await events.findOneAndUpdate(
     { _id: args.event_id },
@@ -515,6 +545,31 @@ const reprove = async (parent, args, { events, artists }) => {
     .populate('subscribers');
   await artists.findOneAndUpdate(
     { _id: args.artst_id },
+    { $push: { recused_events: args.event_id } },
+  );
+  return event;
+};
+
+const reproveProducer = async (parent, args, { events, productors }) => {
+  const event = await events.findOneAndUpdate(
+    { _id: args.event_id },
+    {
+      $pull: { subscribed_productors: args.producer_id },
+      $push: { reproved_productors: args.producer_id },
+    },
+  ).populate('approved_artists')
+    .populate('reproved_artists')
+    .populate({
+      path: 'productor',
+      populate: {
+        path: 'location',
+      },
+    })
+    .populate('location')
+    .populate('subscribed_productors')
+    .populate('subscribers');
+  await productors.findOneAndUpdate(
+    { _id: args.producer_id },
     { $push: { recused_events: args.event_id } },
   );
   return event;
@@ -555,6 +610,41 @@ const resetSubscription = async (parent, args, { events, artists }) => {
   return event;
 };
 
+const resetProducerSubscription = async (parent, args, { events, productors }) => {
+  const event = await events.findOneAndUpdate(
+    { _id: args.event_id },
+    {
+      $pull: {
+        reproved_productors: args.producer_id,
+        approved_productors: args.producer_id,
+      },
+      $push: { subscribed_productors: args.producer_id },
+    },
+  ).populate('approved_artists')
+    .populate('reproved_artists')
+    .populate({
+      path: 'productor',
+      populate: {
+        path: 'location',
+      },
+    })
+    .populate('location')
+    .populate('subscribed_productors')
+    .populate('subscribers');
+
+  await productors.findOneAndUpdate(
+    { _id: args.producer_id },
+    {
+      $pull: {
+        recused_events: args.event_id,
+        approved_events: args.event_id,
+      },
+    },
+  );
+
+  return event;
+};
+
 export default {
   create,
   remove,
@@ -566,8 +656,11 @@ export default {
   subscribeProductor,
   search,
   aprove,
+  aproveProducer,
   reprove,
+  reproveProducer,
   resetSubscription,
+  resetProducerSubscription,
   unsubscribeProductor,
   findLastPostedToProductor,
   findLastPostedToArtist,
