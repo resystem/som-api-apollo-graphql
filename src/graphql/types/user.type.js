@@ -4,6 +4,7 @@ export default `
     id: ID
     ida: String!
     type: String
+    isAdmin: Boolean
     productor: Productor
     artist: Artist
     following_artists: [Artist]
