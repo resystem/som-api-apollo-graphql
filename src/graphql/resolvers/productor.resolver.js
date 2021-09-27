@@ -4,9 +4,13 @@ export default {
   queries: {
     oneProductor: ProductorController.findOne,
     allProductors: ProductorController.findAll,
+    searchProducers: ProductorController.search,
   },
   mutations: {
     createProductor: ProductorController.create,
     updateProductor: ProductorController.update,
+    populateProducersUsername: ProductorController.populateUsername,
+    followProductor: ProductorController.follow,
+    unfollowProductor: ProductorController.unfollow,
   },
 };

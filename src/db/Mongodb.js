@@ -18,10 +18,12 @@ import cities from './schemas/city.model';
 import communityUsers from './schemas/communityUser.model';
 import highlightedOportunities from './schemas/highlighted_oportunities.model';
 import news from './schemas/news.model';
+import newsLatters from './schemas/newsLatter.model';
 
 let connection;
 
 export default async ({ mongoUrl = 'mongodb://localhost/som-local' }) => {
+  console.log('🚀 ~ mongoUrl', mongoUrl);
   try {
     if (!connection) {
       console.log('=> using new database connection');
@@ -54,6 +56,7 @@ export default async ({ mongoUrl = 'mongodb://localhost/som-local' }) => {
       connection.model('communityUsers', communityUsers);
       connection.model('highlightedOportunities', highlightedOportunities);
       connection.model('news', news);
+      connection.model('newsLatters', newsLatters);
 
       return connection;
     }

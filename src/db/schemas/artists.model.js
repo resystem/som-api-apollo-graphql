@@ -7,12 +7,14 @@ ObjectId.prototype.valueOf = () => this.toString();
 const artistModel = new Schema({
   user: { type: ObjectId, ref: 'users' },
   name: { type: String, required: true },
+  username: { type: String },
   members_number: { type: Number, default: 1 },
   avatar_image: {
     mimified: { type: String, default: '' },
     original: { type: String, default: '' },
     thumbnail: { type: String, default: '' },
   },
+  status: { type: String, default: 'INCOMPLETE' },
   about: { type: String, default: '' },
   country: { type: String, default: '' },
   state: { type: String, default: '' },
@@ -34,10 +36,7 @@ const artistModel = new Schema({
   tec_rider: { type: String, default: '' },
   tec_release: { type: String, default: '' },
 
-  follows: [{
-    user: { type: ObjectId, ref: 'users' },
-    created_at: { type: Date, default: Date.now() },
-  }],
+  follows: [{ type: ObjectId, ref: 'users' }],
   hometown: { type: String, default: '' },
   google_id: { type: String, default: '' },
   twitter_id: { type: String, default: '' },

@@ -1,10 +1,4 @@
 export default `
-
-  type ArtistFollow {
-    user: User
-    created_at: String
-  }  
-
   type Artist {
     id: ID
     user: User
@@ -13,6 +7,7 @@ export default `
     members_number: Int
     avatar_image: Image
     about: String
+    username: String
     country: String
     state: String
     city: String
@@ -42,7 +37,8 @@ export default `
     whatsapp: String
     telegram: String
     integrants: [String]
-    follows: [ArtistFollow]
+    follows: [User]
+    status: String
   }
   
   input ArtistInput {
@@ -51,6 +47,7 @@ export default `
     phone: String
     name: String
     members_number: Int
+    username: String
     avatar_image: ImageInput
     about: String
     country: String
@@ -72,5 +69,6 @@ export default `
     twitter: String
     youtube: String
     email: String
+    status: String
   }
 `;

@@ -5,11 +5,13 @@ export default {
     oneArtist: ArtistController.findOne,
     allArtists: ArtistController.findAll,
     searchArtists: ArtistController.searchArtists,
+    newSearchArtists: ArtistController.search
   },
   mutations: {
     createArtist: ArtistController.create,
     updateArtist: ArtistController.update,
     followArtist: ArtistController.follow,
     unfollowArtist: ArtistController.unfollow,
+    populateArtstsUsername: ArtistController.populateUsername,
   },
 };

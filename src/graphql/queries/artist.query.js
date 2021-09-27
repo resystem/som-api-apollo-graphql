@@ -1,6 +1,7 @@
 export default `
   oneArtist( 
-    id: ID!
+    id: ID
+    username: String
   ): Artist
 
   allArtists( 
@@ -11,5 +12,9 @@ export default `
   searchArtists( 
     artist: JSON
     paginator: PaginatorInput
+  ): [Artist]
+
+  newSearchArtists(
+    text: String!
   ): [Artist]
 `;

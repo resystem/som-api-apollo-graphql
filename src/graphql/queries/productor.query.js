@@ -7,4 +7,8 @@ export default `
     productor: ProductorInput
     paginator: PaginatorInput
   ): [Productor]
+
+  searchProducers(
+    text: String!
+  ): [Productor]
 `;

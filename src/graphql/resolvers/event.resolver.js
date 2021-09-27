@@ -16,8 +16,11 @@ export default {
     unsubscribeEvent: EventController.unsubscribe,
     unsubscribeProductorOnEvent: EventController.unsubscribeProductor,
     aproveArtist: EventController.aprove,
+    aproveProducer: EventController.aproveProducer,
     reproveArtist: EventController.reprove,
+    reproveProducer: EventController.reproveProducer,
     resetSubscriptionEvent: EventController.resetSubscription,
+    resetProducerSubscriptionEvent: EventController.resetProducerSubscription,
     removeOpportunity: EventController.remove,
   },
 };

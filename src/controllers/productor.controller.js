@@ -1,17 +1,29 @@
-import { getAuthorization, mapProducerToSales, sendToSalesForce } from '../services/salesforce.service';
-import { sliceArgs } from '../utils/query.utils';
+import {
+  getAuthorization,
+  mapProducerToSales,
+  sendToSalesForce
+} from '../services/salesforce.service';
+import {
+  sliceArgs
+} from '../utils/query.utils';
 
 /**
-  * create - Essa função cria um produtor de evento na base de dados
-  *
-  * @function create
-  * @param {object} parent Informações de um possível pai
-  * @param {object} args Informações envadas na queuery ou mutation
-  * @param {object} context Informações passadas no context para o apollo graphql
-  */
-const create = async (parent, args, { productors, users }) => {
+ * create - Essa função cria um produtor de evento na base de dados
+ *
+ * @function create
+ * @param {object} parent Informações de um possível pai
+ * @param {object} args Informações envadas na queuery ou mutation
+ * @param {object} context Informações passadas no context para o apollo graphql
+ */
+const create = async (parent, args, {
+  productors,
+  users
+}) => {
   const validate = {}; // validateArtist(); fazer função de validação
   if (validate.error) throw new Error(validate.msg);
+
+  const verify = await productors.findOne({ username: args.productor.username });
+  if (verify) throw new Error('invalid/username');
 
   const productor = await productors.create(args.productor)
     .then(resp => resp
@@ -26,6 +38,7 @@ const create = async (parent, args, { productors, users }) => {
       .populate('musical_styles')
       .populate('occupations')
       .populate('location')
+      .populate('follows')
       .execPopulate())
     .catch((err) => {
       throw new Error(err);
@@ -38,30 +51,41 @@ const create = async (parent, args, { productors, users }) => {
     const salesForceUser = await sendToSalesForce(auth, mappedToSales);
     salesforceId = salesForceUser.id;
   } catch (err) {
-    throw err;
     console.log('err:', err);
   }
+  const mappeduser = {
+    productor: productor._id
+  };
+  if (salesforceId) mappeduser.sales_id = salesforceId;
 
-  await users.update(
-    { _id: productor.user._id },
-    { productor: productor._id, sales_id: salesforceId },
-    { new: true },
+  await users.update({
+      _id: productor.user._id
+    },
+    mappeduser, {
+      new: true 
+    },
   );
 
   return productor;
 };
 
 /**
-  * update - Essa função atualiza um produtor de evento na base de dados
-  *
-  * @function update
-  * @param {object} parent Informações de um possível pai
-  * @param {object} args Informações envadas na queuery ou mutation
-  * @param {object} context Informações passadas no context para o apollo graphql
-  */
-const update = async (parent, args, { productors, users }) => {
+ * update - Essa função atualiza um produtor de evento na base de dados
+ *
+ * @function update
+ * @param {object} parent Informações de um possível pai
+ * @param {object} args Informações envadas na queuery ou mutation
+ * @param {object} context Informações passadas no context para o apollo graphql
+ */
+const update = async (parent, args, {
+  productors,
+  users
+}) => {
   const validate = {}; // validateArtist(); fazer função de validação
   if (validate.error) throw new Error(validate.msg);
+
+  const verify = await productors.findOne({ username: args.productor.username });
+  if (verify && verify._id.toString() !== args.productor_id) throw new Error('invalid/username');
 
   const producer = await productors.findOneAndUpdate({ _id: args.productor_id }, args.productor, { new: true })
     .populate('user')
@@ -69,6 +93,7 @@ const update = async (parent, args, { productors, users }) => {
     .populate('musical_styles')
     .populate('occupations')
     .populate('location')
+    .populate('follows')
     .then(resp => resp)
     .catch((err) => {
       throw new Error(err);
@@ -81,13 +106,17 @@ const update = async (parent, args, { productors, users }) => {
     const salesForceUser = await sendToSalesForce(auth, mappedToSales);
     salesforceId = salesForceUser.id;
   } catch (err) {
-    throw err;
+    console.log('err:', err);
   }
 
-  await users.update(
-    { _id: producer.user._id },
-    { sales_id: salesforceId },
-  );
+  if (salesforceId) {
+    await users.update({
+      _id: producer.user._id
+    }, {
+      sales_id: salesforceId
+    }, );
+  };
+
 
   return producer;
 };
@@ -100,7 +129,7 @@ const update = async (parent, args, { productors, users }) => {
   * @param {object} args Informações envadas na queuery ou mutation
   * @param {object} context Informações passadas no context para o apollo graphql
   */
-const findOne = (parent, args, { productors }) => productors.findOne({ _id: args.productor.id })
+const findOne = (parent, args, { productors }) => productors.findOne({ username: args.productor.username })
   .populate('user')
   .populate('events')
   .populate({
@@ -112,23 +141,27 @@ const findOne = (parent, args, { productors }) => productors.findOne({ _id: args
       'location',
     ],
   })
+  .populate('follows')
   .populate('musical_styles')
   .populate('occupations')
   .populate('location')
+  .populate('follows')
   .then(resp => resp)
   .catch((err) => {
     throw new Error(err);
   });
 
 /**
-  * findAll - Essa função procura e retorna vários produtores de eventos da base de dados
-  *
-  * @function findAll
-  * @param {object} parent Informações de um possível pai
-  * @param {object} args Informações envadas na queuery ou mutation
-  * @param {object} context Informações passadas no context para o apollo graphql
-  */
-const findAll = (parent, args, { productors }) => {
+ * findAll - Essa função procura e retorna vários produtores de eventos da base de dados
+ *
+ * @function findAll
+ * @param {object} parent Informações de um possível pai
+ * @param {object} args Informações envadas na queuery ou mutation
+ * @param {object} context Informações passadas no context para o apollo graphql
+ */
+const findAll = (parent, args, {
+  productors
+}) => {
   const options = sliceArgs(args);
   return productors.find(options.query.productor)
     .populate('user')
@@ -145,10 +178,147 @@ const findAll = (parent, args, { productors }) => {
     .populate('musical_styles')
     .populate('occupations')
     .populate('location')
+    .populate('follows')
     .then(resp => resp)
     .catch((err) => {
       throw new Error(err);
     });
+};
+
+/**
+  * searchProducers - Essa função procura e retorna vários produtores da base de dados
+  *
+  * @function searchProducers
+  * @param {object} parent Informações de um possível pai
+  * @param {object} args Informações envadas na queuery ou mutation
+  */
+const search = async (parent, args, {
+  productors, users, productorOccupations
+}) => {
+
+  const $lookup = {
+    from: productorOccupations.collection.name,
+    as: 'occupationsObjects',
+    localField: 'occupations',
+    foreignField: '_id'
+  }
+
+  const $match = {
+    $or: [{
+        name: new RegExp(args.text, 'ig')
+      },
+      {
+        'occupationsObjects.label': new RegExp(args.text, 'ig')
+      }
+    ]
+  }
+
+  const aggregate = [];
+  
+  aggregate.push({
+    $lookup
+  })
+
+  aggregate.push({
+    $match
+  })
+
+  const producers = await productors.aggregate(aggregate)
+    .skip(args.paginator?.skip || 0)
+    .limit(args.paginator?.limit || 25);
+
+    console.log(productorOccupations.collection.name)
+
+
+  await users.populate(producers, {
+    path: 'user'
+  });
+  await productorOccupations.populate(producers, {
+    path: 'occupations'
+  });
+
+  console.log(producers)
+
+
+  return producers.map(producer => ({ ...producer, id: producer._id })) || [];
+}
+/**
+  * populateUsername - Essa função procura e retorna vários produtores de eventos da base de dados
+  *
+  * @function populateUsername
+  * @param {object} parent Informações de um possível pai
+  * @param {object} args Informações envadas na queuery ou mutation
+  * @param {object} context Informações passadas no context para o apollo graphql
+  */
+const populateUsername = async (parent, args, { productors }) => {
+  const producers = await productors.find({ username: { $exists: false} })
+  const requests = producers.map((p) => new Promise(async (res, rej) => {
+    const producer = await productors.findOneAndUpdate({ _id: p._id }, { username: getRandomCode(6) },  { new: true });
+    console.log('🚀 ~ producer', producer.username);
+    return {
+      ...producer,
+      id: producer._id,
+    }
+  }));
+  return await Promise.all(requests);
+};
+
+/**
+  * follow - Essa função realiza a lógica de seguidores
+  *
+  * @function follow
+  * @param {object} parent Informações de um possível pai
+  * @param {object} args Informações envadas na queuery ou mutation
+  * @param {object} context Informações passadas no context para o apollo graphql
+  */
+const follow = async (parent, args, {
+  productors
+}) => {
+  const { id, user_id } = args;
+  const productor = await productors.findOne({ _id: id });
+
+  const followers = JSON.parse(JSON.stringify(productor));
+  const follows = followers.follows.filter(sbs => sbs !== user_id);
+
+  follows.push(user_id);
+
+  const producer = await productors
+    .findOneAndUpdate({ _id: id }, { follows: follows })
+    .populate('user')
+    .populate('follows') 
+    .catch((err) => {
+      throw new Error(err);
+    });
+  return producer;
+};
+
+/**
+  * unfollow - Essa função realiza a lógica de seguidores
+  *
+  * @function unfollow
+  * @param {object} parent Informações de um possível pai
+  * @param {object} args Informações envadas na queuery ou mutation
+  * @param {object} context Informações passadas no context para o apollo graphql
+  */
+const unfollow = async (parent, args, {
+  productors
+}) => {
+  const { id, user_id } = args;
+  const productor = await productors.findOne({ _id: id });
+  
+  const followers = JSON.parse(JSON.stringify(productor));
+
+  const follows = followers.follows.filter(sbs => sbs !== user_id);
+
+  const producer = await productors
+    .findOneAndUpdate({ _id: id }, { follows: follows })
+    .populate('user')
+    .populate('follows') 
+    .catch((err) => {
+      throw new Error(err);
+    });
+
+  return producer;
 };
 
 export default {
@@ -156,4 +326,8 @@ export default {
   findOne,
   findAll,
   update,
+  search,
+  populateUsername,
+  follow,
+  unfollow
 };

@@ -2,16 +2,21 @@ export default `
   createArtist(
     artist: ArtistInput!
   ): Artist
+
   updateArtist(
     artist_id: ID!
     artist: ArtistInput!
   ): Artist
+
   followArtist(
-    artist: ID!,
-    user: ID!
-  ) : Artist
+    id: String!
+    user_id: String!
+  ): Artist
+
   unfollowArtist(
-    artist: ID!,
-    user: ID!
-  ) : Artist
+    id: String!
+    user_id: String!
+  ): Artist
+
+  populateArtstsUsername: [Artist]
 `;

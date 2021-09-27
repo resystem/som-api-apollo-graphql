@@ -80,7 +80,12 @@ const update = (parent, args, { events }) => {
 const findOne = (parent, args, { events }) => {
   const options = sliceArgs(args);
 
-  return events.findOne({ _id: options.query.id, deleted: false })
+  return events.findOne({
+    $or: [
+      { _id: options.query.id, deleted: { $exists: true },  deleted: false },
+      { _id: options.query.id, deleted: { $exists: false } },
+    ],
+  })
     .populate('approved_productors')
     .populate('reproved_productors')
     .populate('approved_artists')
@@ -110,7 +115,12 @@ const findOne = (parent, args, { events }) => {
   */
 const findAll = (parent, args, { events }) => {
   const options = sliceArgs(args);
-  return events.find({ ...options.query.event, deleted: false })
+  return events.find({
+    $or: [
+      { ...options.query.event, deleted: { $exists: true },  deleted: false },
+      { ...options.query.event, deleted: { $exists: false } },
+    ],
+  })
     .sort(options.paginator.sort || {})
     .limit(options.paginator.limit || 0)
     .populate('approved_productors')
@@ -186,7 +196,12 @@ const remove = async (parent, args, { events, productors }) => {
   * @param {object} args Informações envadas na queuery ou mutation
   * @param {object} context Informações passadas no context para o apollo graphql
   */
-const findLastPostedToArtist = (parent, args, { events }) => events.find({ is_to_artist: true })
+const findLastPostedToArtist = (parent, args, { events }) => events.find({
+  $or: [
+    { is_to_artist: true, deleted: { $exists: true },  deleted: false },
+    { is_to_artist: true, deleted: { $exists: false } },
+  ],
+})
   .sort({ created_at: -1 })
   .populate('approved_productors')
   .populate('reproved_productors')
@@ -215,7 +230,12 @@ const findLastPostedToArtist = (parent, args, { events }) => events.find({ is_to
 * @param {object} context Informações passadas no context para o apollo graphql
 */
 const findLastPostedToProductor = (parent, args, { events }) => events
-  .find({ is_to_productor: true })
+  .find({ 
+    $or: [
+      { is_to_productor: true, deleted: { $exists: true },  deleted: false },
+      { is_to_productor: true, deleted: { $exists: false } },
+    ],
+  })
   .sort({ created_at: -1 })
   .populate('approved_productors')
   .populate('reproved_productors')
@@ -249,9 +269,12 @@ const search = async (parent, args, {
   productors,
   locations,
 }) => {
-  const agregate = [];
+  const aggregate = [];
   const firstMatch = {
-    ...args.event,
+    $or: [
+      { ...args.event, deleted: { $exists: true },  deleted: false },
+      { ...args.event, deleted: { $exists: false } },
+    ],
   };
   if (args.musical_styles && args.musical_styles.length) {
     firstMatch.musical_styles = { $in: args.musical_styles };
@@ -264,24 +287,36 @@ const search = async (parent, args, {
 
   const secondMatch = {};
 
-  if (args.years.length) {
+  if (args.years?.length) {
     secondMatch.event_year = { $in: args.years };
   }
 
-  if (args.months.length) {
+  if (args.months?.length) {
     secondMatch.event_month = { $in: args.months };
   }
+  
+  if (args.text?.length) {
+    const textMatch = [
+      { name: new RegExp(args.text, 'ig') },
+      { 'musical_styles.name': new RegExp(args.text, 'ig') }
+    ];
+    secondMatch.$or = textMatch; 
+  }
 
-  agregate.push({ $match: firstMatch });
-  agregate.push({ $addFields: addFields });
+  aggregate.push({ $addFields: addFields });
+  aggregate.push({ $match: firstMatch });
 
-  if (Object.keys(secondMatch).length) agregate.push({ $match: secondMatch });
+  if (args.text) aggregate.push({ $lookup: { from: 'musical_styles', as: 'tags', localField: 'musical_styles', foreignField: '_id' } });
 
-  if (args.paginator.sort) agregate.push({ $sort: args.paginator.sort });
+  if (Object.keys(secondMatch).length) aggregate.push({ $match: secondMatch });
 
-  const myEvents = await events.aggregate(agregate)
-    .skip(args.paginator.skip || 0)
-    .limit(args.paginator.limit || 25);
+  if (args.paginator?.sort) aggregate.push({ $sort: args.paginator.sort });
+
+  console.log(aggregate[1])
+
+  const myEvents = await events.aggregate(aggregate)
+    .skip(args.paginator?.skip || 0)
+    .limit(args.paginator?.limit || 25);
 
   await artists.populate(myEvents, { path: 'approved_artists' });
   await productors.populate(myEvents, { path: 'productor', populate: { path: 'location' } });
@@ -460,6 +495,36 @@ const aprove = async (parent, args, { events, artists }) => {
   return event;
 };
 
+
+const aproveProducer = async (parent, args, { events, productors }) => {
+  const event = await events.findOneAndUpdate(
+    {
+      _id: args.event_id,
+    }, {
+      $pull: { subscribed_productors: args.producer_id },
+      $push: { approved_productors: args.producer_id },
+    },
+  ).populate('approved_productors')
+    .populate('reproved_productors')
+    .populate('approved_artists')
+    .populate('reproved_artists')
+    .populate({
+      path: 'productor',
+      populate: {
+        path: 'location',
+      },
+    })
+    .populate('location')
+    .populate('subscribed_productors')
+    .populate('subscribers');
+  await productors.findOneAndUpdate(
+    { _id: args.producer_id },
+    { $push: { approved_events: args.event_id } },
+  );
+  return event;
+};
+
+
 const reprove = async (parent, args, { events, artists }) => {
   const event = await events.findOneAndUpdate(
     { _id: args.event_id },
@@ -480,6 +545,31 @@ const reprove = async (parent, args, { events, artists }) => {
     .populate('subscribers');
   await artists.findOneAndUpdate(
     { _id: args.artst_id },
+    { $push: { recused_events: args.event_id } },
+  );
+  return event;
+};
+
+const reproveProducer = async (parent, args, { events, productors }) => {
+  const event = await events.findOneAndUpdate(
+    { _id: args.event_id },
+    {
+      $pull: { subscribed_productors: args.producer_id },
+      $push: { reproved_productors: args.producer_id },
+    },
+  ).populate('approved_artists')
+    .populate('reproved_artists')
+    .populate({
+      path: 'productor',
+      populate: {
+        path: 'location',
+      },
+    })
+    .populate('location')
+    .populate('subscribed_productors')
+    .populate('subscribers');
+  await productors.findOneAndUpdate(
+    { _id: args.producer_id },
     { $push: { recused_events: args.event_id } },
   );
   return event;
@@ -520,6 +610,41 @@ const resetSubscription = async (parent, args, { events, artists }) => {
   return event;
 };
 
+const resetProducerSubscription = async (parent, args, { events, productors }) => {
+  const event = await events.findOneAndUpdate(
+    { _id: args.event_id },
+    {
+      $pull: {
+        reproved_productors: args.producer_id,
+        approved_productors: args.producer_id,
+      },
+      $push: { subscribed_productors: args.producer_id },
+    },
+  ).populate('approved_artists')
+    .populate('reproved_artists')
+    .populate({
+      path: 'productor',
+      populate: {
+        path: 'location',
+      },
+    })
+    .populate('location')
+    .populate('subscribed_productors')
+    .populate('subscribers');
+
+  await productors.findOneAndUpdate(
+    { _id: args.producer_id },
+    {
+      $pull: {
+        recused_events: args.event_id,
+        approved_events: args.event_id,
+      },
+    },
+  );
+
+  return event;
+};
+
 export default {
   create,
   remove,
@@ -531,8 +656,11 @@ export default {
   subscribeProductor,
   search,
   aprove,
+  aproveProducer,
   reprove,
+  reproveProducer,
   resetSubscription,
+  resetProducerSubscription,
   unsubscribeProductor,
   findLastPostedToProductor,
   findLastPostedToArtist,
