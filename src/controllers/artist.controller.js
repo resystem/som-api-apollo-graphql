@@ -131,7 +131,7 @@ const findOne = (parent, args, { artists }) => artists
   .populate('songs')
   .populate('musical_styles')
   .populate('category')
-  .populate('follows.user')
+  .populate('follows')
   .then(resp => resp)
   .catch((err) => {
     throw new Error(err);
