@@ -2,7 +2,7 @@ export default `
 
   type User {
     id: ID
-    ida: String!
+    ida: String
     type: String
     isAdmin: Boolean
     productor: Productor
@@ -15,8 +15,9 @@ export default `
   
   input UserInput {
     id: ID
-    ida: String!
+    ida: String
     type: String
+    isAdmin: Boolean
     productor: String
     artist: String
     likes: [String]
