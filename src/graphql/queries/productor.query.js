@@ -1,6 +1,7 @@
 export default `
   oneProductor( 
-    productor: ProductorInput
+    username: String
+    id: ID
   ): Productor
 
   allProductors( 

@@ -129,7 +129,13 @@ const update = async (parent, args, {
   * @param {object} args Informações envadas na queuery ou mutation
   * @param {object} context Informações passadas no context para o apollo graphql
   */
-const findOne = (parent, args, { productors }) => productors.findOne({ username: args.productor.username })
+const findOne = (parent, args, { productors }) => productors
+  .findOne({
+    $or: [
+      { username: args.username },
+      { _id: args.id },
+    ]
+  })
   .populate('user')
   .populate('events')
   .populate({
@@ -140,6 +146,21 @@ const findOne = (parent, args, { productors }) => productors.findOne({ username:
       'reproved_artists',
       'location',
     ],
+  })
+  .populate('approved_opportunities')
+  .populate({
+    path: 'approved_opportunities',
+    populate: ['location', 'subscribers', 'approved_artists', 'productor'],
+  })
+  .populate('subscribed_opportunities')
+  .populate({
+    path: 'subscribed_opportunities',
+    populate: ['location', 'subscribers', 'approved_artists', 'productor'],
+  })
+  .populate('refused_opportunities')
+  .populate({
+    path: 'refused_opportunities',
+    populate: ['location', 'subscribers', 'approved_artists', 'productor'],
   })
   .populate('follows')
   .populate('musical_styles')

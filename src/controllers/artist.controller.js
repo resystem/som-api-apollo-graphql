@@ -117,15 +117,32 @@ const update = async (parent, args, { artists, users }) => {
   * @param {object} context Informações passadas no context para o apollo graphql
   */
 const findOne = (parent, args, { artists }) => artists
-  .findOne({ username: args.username })
+  .findOne({
+    $or: [
+      { username: args.username },
+      { _id: args.id },
+    ]
+  })
   .populate('user')
   .populate({
     path: 'user',
     populate: ['following_artists', 'following_productors'],
   })
   .populate('approved_events')
+  .populate({
+    path: 'approved_events',
+    populate: ['location', 'subscribers', 'approved_artists', 'productor'],
+  })
   .populate('subscribed_events')
+  .populate({
+    path: 'subscribed_events',
+    populate: ['location', 'subscribers', 'approved_artists', 'productor'],
+  })
   .populate('recused_events')
+  .populate({
+    path: 'recused_events',
+    populate: ['location', 'subscribers', 'approved_artists', 'productor'],
+  })
   .populate('musical_genres')
   .populate('location')
   .populate('songs')
