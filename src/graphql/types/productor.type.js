@@ -26,6 +26,9 @@ export default `
     twitter: String
     instagram: String
     youtube: String
+    subscribed_opportunities: [Event]
+    refused_opportunities: [Event]
+    approved_opportunities: [Event]
   }
 
   input ProductorInput {
