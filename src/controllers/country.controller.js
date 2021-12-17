@@ -55,7 +55,7 @@ const findOne = (parent, args, { countries }) => {
   */
 const findAll = async (parent, args, { countries }) => {
   const options = sliceArgs(args);
-  const myCountries = await countries.find(options.query.country);
+  const myCountries = await countries.find(options.query.country).sort({name:1});
   return myCountries.map((c) => {
     const country = c;
     country.id = c._id;
